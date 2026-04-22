@@ -1,0 +1,16 @@
+app:
+  debug-features-enabled: true
+
+logging:
+  level:
+    root: INFO
+
+springdoc:
+  api-docs:
+    enabled: ${app.debug-features-enabled:false}
+    path: /openapi
+  swagger-ui:
+    enabled: ${app.debug-features-enabled:false}
+    path: /swagger-ui.html
+server:
+  port: 3000
