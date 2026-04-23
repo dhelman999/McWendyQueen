@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CondimentItemRequestDTO {
+public class MenuItemResponseDTO {
+    private long id;
+
     private String name;
 }
