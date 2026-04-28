@@ -11,6 +11,8 @@ public class RecipeItemResponseDTO {
     private long id;
 
     private long menuId;
+    private String menuItemName;
 
     private long condimentId;
+    private String condimentName;
 }

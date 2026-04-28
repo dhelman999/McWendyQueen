@@ -8,9 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RecipeItemRequestDTO {
-    private long id;
+    private String menuItemName;
 
-    private long menuId;
-
-    private long condimentId;
+    private String condimentName;
 }

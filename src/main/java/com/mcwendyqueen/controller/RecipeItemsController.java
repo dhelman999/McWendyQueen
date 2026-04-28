@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.mcwendyqueen.ApiConstants.API_BASE_PATH;
@@ -38,9 +39,8 @@ public class RecipeItemsController {
     public ResponseEntity<List<RecipeItemResponseDTO>> getAllRecipeItems() {
         List<RecipeItem> allRecipeItems = recipeItemService.getAllRecipeItems();
 
-        List<RecipeItemResponseDTO> response = allRecipeItems.stream()
-                .map(ModelMapperUtils::GetRecipeItemResponseDTO)
-                .toList();
+        List<RecipeItemResponseDTO> response = new ArrayList<>();
+        allRecipeItems.forEach(item -> response.add(recipeItemService.hydrateRecipeItem(item)));
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

@@ -15,3 +15,17 @@ springdoc:
     use-root-path: true
 server:
   port: 3000
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5434/postgres?sslmode=disable
+    username: postgres
+    password: admin
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect

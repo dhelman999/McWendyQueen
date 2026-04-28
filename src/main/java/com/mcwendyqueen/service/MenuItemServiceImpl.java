@@ -1,63 +1,109 @@
 package com.mcwendyqueen.service;
 
 import com.mcwendyqueen.model.MenuItem;
+import com.mcwendyqueen.model.MenuItemRepository;
 import com.mcwendyqueen.model.MenuItemRequestDTO;
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
+
+import static com.mcwendyqueen.service.MenuItemServiceImpl.MenuItemEnum.CHEESEBURGER;
+import static com.mcwendyqueen.service.MenuItemServiceImpl.MenuItemEnum.FRIES;
+import static com.mcwendyqueen.service.MenuItemServiceImpl.MenuItemEnum.SALAD;
 
 @Service
 public class MenuItemServiceImpl implements MenuItemService {
-    private final Map<Long, MenuItem> menuItemsMap;
+    private final MenuItemRepository menuItemRepository;
 
-    private long menuItemId;
+    public static final long UNKNOWN_MENU_ITEM = -1;
 
-    public MenuItemServiceImpl() {
-        menuItemsMap = new ConcurrentHashMap<>();
-        menuItemId = 1;
+    @Getter
+    public enum MenuItemEnum {
+        CHEESEBURGER("cheeseburger"),
+        FRIES("fries"),
+        SALAD("salad");
+
+        private final String shortName;
+
+        MenuItemEnum(String shortName) {
+            this.shortName = shortName;
+        }
+
+        @Override
+        public String toString() {
+            return shortName;
+        }
+    }
+
+    @Autowired
+    public MenuItemServiceImpl(MenuItemRepository menuItemRepository) {
+        this.menuItemRepository = menuItemRepository;
         addAllMenuItems();
     }
 
     @Override
     public List<MenuItem> getAllMenuItems() {
-        return new ArrayList<>(menuItemsMap.values());
+        return menuItemRepository.findAll();
     }
 
     @Override
-    public MenuItem createMenuItem(MenuItemRequestDTO newMenuItem) {
-        MenuItem createdMenuItem = new MenuItem(menuItemId++, newMenuItem.getName());
-        menuItemsMap.put(menuItemId, createdMenuItem);
+    public Optional<MenuItem> getMenuItemById(long menuItemId) {
+        return menuItemRepository.findById(menuItemId);
+    }
 
-        return createdMenuItem;
+    @Override
+    public Optional<MenuItem> getMenuItemByName(String menuItemName) {
+        return menuItemRepository.findByName(menuItemName);
+    }
+    
+    @Override
+    public MenuItem createMenuItem(MenuItemRequestDTO newMenuItem) {
+        return createMenuItem(newMenuItem.getName());
     }
 
     @Override
     public MenuItem deleteMenuItem(MenuItemRequestDTO menuItem) {
-        Optional<MenuItem> removedMenuItem = menuItemsMap.values().stream()
-                .filter(item -> item.getName().equals(menuItem.getName()))
-                .findFirst();
+        Long menuItemId = getMenuItemIdByName(menuItem.getName());
 
-        MenuItem removedItem = removedMenuItem.orElse(null);
+        Optional<MenuItem> menuItemToDelete = menuItemRepository.findById(menuItemId);
+        MenuItem deletedMenuItem = null;
 
-        if (removedItem != null) {
-            menuItemsMap.remove(menuItemId);
+        if (menuItemToDelete.isPresent()) {
+            menuItemRepository.deleteById(menuItemId);
+            deletedMenuItem = menuItemToDelete.get();
         }
 
-        return removedItem;
+        return deletedMenuItem;
+    }
+
+    @Override
+    public long getMenuItemIdByName(String name) {
+        Optional<MenuItem> menuItem = menuItemRepository.findByName(name);
+
+        return menuItem.map(MenuItem::getId).orElse(UNKNOWN_MENU_ITEM);
+
+    }
+
+    public MenuItem createMenuItem(String name) {
+        Optional<MenuItem> existingMenuItem = menuItemRepository.findByName(name);
+
+        if(existingMenuItem.isPresent()) {
+            // need to throw some problem or log
+            return existingMenuItem.get();
+        }
+
+        MenuItem newMenuItem = new MenuItem(name);
+        menuItemRepository.save(newMenuItem);
+
+        return newMenuItem;
     }
 
     private void addAllMenuItems() {
-        MenuItem newMenuItem = new MenuItem(menuItemId++, "cheeseburger");
-        menuItemsMap.put(newMenuItem.getId(), newMenuItem);
-
-        newMenuItem = new MenuItem(menuItemId++, "fries");
-        menuItemsMap.put(newMenuItem.getId(), newMenuItem);
-
-        newMenuItem = new MenuItem(menuItemId++, "salad");
-        menuItemsMap.put(newMenuItem.getId(), newMenuItem);
+        createMenuItem(CHEESEBURGER.getShortName());
+        createMenuItem(FRIES.getShortName());
+        createMenuItem(SALAD.getShortName());
     }
 }
