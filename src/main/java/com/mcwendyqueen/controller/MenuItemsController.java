@@ -1,10 +1,10 @@
 package com.mcwendyqueen.controller;
 
-import com.mcwendyqueen.model.MenuItem;
-import com.mcwendyqueen.model.MenuItemRequestDTO;
-import com.mcwendyqueen.model.MenuItemResponseDTO;
+import com.mcwendyqueen.model.menuitem.MenuItem;
+import com.mcwendyqueen.model.menuitem.MenuItemRequestDTO;
+import com.mcwendyqueen.model.menuitem.MenuItemResponseDTO;
 import com.mcwendyqueen.model.ModelMapperUtils;
-import com.mcwendyqueen.service.MenuItemService;
+import com.mcwendyqueen.service.menuitem.MenuItemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.extern.slf4j.Slf4j;

@@ -1,10 +1,10 @@
 package com.mcwendyqueen.controller;
 
-import com.mcwendyqueen.model.CondimentItem;
-import com.mcwendyqueen.model.CondimentItemRequestDTO;
-import com.mcwendyqueen.model.CondimentItemResponseDTO;
+import com.mcwendyqueen.model.condiment.CondimentItem;
+import com.mcwendyqueen.model.condiment.CondimentItemRequestDTO;
+import com.mcwendyqueen.model.condiment.CondimentItemResponseDTO;
 import com.mcwendyqueen.model.ModelMapperUtils;
-import com.mcwendyqueen.service.CondimentItemService;
+import com.mcwendyqueen.service.condiment.CondimentItemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.extern.slf4j.Slf4j;

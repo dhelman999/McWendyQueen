@@ -1,10 +1,10 @@
 package com.mcwendyqueen.controller;
 
 import com.mcwendyqueen.model.ModelMapperUtils;
-import com.mcwendyqueen.model.RecipeItem;
-import com.mcwendyqueen.model.RecipeItemRequestDTO;
-import com.mcwendyqueen.model.RecipeItemResponseDTO;
-import com.mcwendyqueen.service.RecipeItemService;
+import com.mcwendyqueen.model.recipe.RecipeItem;
+import com.mcwendyqueen.model.recipe.RecipeItemRequestDTO;
+import com.mcwendyqueen.model.recipe.RecipeItemResponseDTO;
+import com.mcwendyqueen.service.recipe.RecipeItemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.extern.slf4j.Slf4j;

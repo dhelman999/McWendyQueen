@@ -1,8 +1,8 @@
-package com.mcwendyqueen.service;
+package com.mcwendyqueen.service.recipe;
 
-import com.mcwendyqueen.model.RecipeItem;
-import com.mcwendyqueen.model.RecipeItemRequestDTO;
-import com.mcwendyqueen.model.RecipeItemResponseDTO;
+import com.mcwendyqueen.model.recipe.RecipeItem;
+import com.mcwendyqueen.model.recipe.RecipeItemRequestDTO;
+import com.mcwendyqueen.model.recipe.RecipeItemResponseDTO;
 
 import java.util.List;
 

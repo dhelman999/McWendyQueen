@@ -1,8 +1,8 @@
-package com.mcwendyqueen.service;
+package com.mcwendyqueen.service.condiment;
 
-import com.mcwendyqueen.model.CondimentItem;
-import com.mcwendyqueen.model.CondimentItemRequestDTO;
-import com.mcwendyqueen.model.CondimentRepository;
+import com.mcwendyqueen.model.condiment.CondimentItem;
+import com.mcwendyqueen.model.condiment.CondimentItemRequestDTO;
+import com.mcwendyqueen.model.condiment.CondimentRepository;
 import com.mcwendyqueen.model.ModelMapperUtils;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,13 +11,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-import static com.mcwendyqueen.service.CondimentItemServiceImpl.CondimentEnum.CHEESE;
-import static com.mcwendyqueen.service.CondimentItemServiceImpl.CondimentEnum.KETCHUP;
-import static com.mcwendyqueen.service.CondimentItemServiceImpl.CondimentEnum.LETTUCE;
-import static com.mcwendyqueen.service.CondimentItemServiceImpl.CondimentEnum.MUSTARD;
-import static com.mcwendyqueen.service.CondimentItemServiceImpl.CondimentEnum.ONIONS;
-import static com.mcwendyqueen.service.CondimentItemServiceImpl.CondimentEnum.PICKLES;
-import static com.mcwendyqueen.service.CondimentItemServiceImpl.CondimentEnum.TOMATOES;
+import static com.mcwendyqueen.service.condiment.CondimentItemServiceImpl.CondimentEnum.CHEESE;
+import static com.mcwendyqueen.service.condiment.CondimentItemServiceImpl.CondimentEnum.KETCHUP;
+import static com.mcwendyqueen.service.condiment.CondimentItemServiceImpl.CondimentEnum.LETTUCE;
+import static com.mcwendyqueen.service.condiment.CondimentItemServiceImpl.CondimentEnum.MUSTARD;
+import static com.mcwendyqueen.service.condiment.CondimentItemServiceImpl.CondimentEnum.ONIONS;
+import static com.mcwendyqueen.service.condiment.CondimentItemServiceImpl.CondimentEnum.PICKLES;
+import static com.mcwendyqueen.service.condiment.CondimentItemServiceImpl.CondimentEnum.TOMATOES;
 
 @Service
 public class CondimentItemServiceImpl implements  CondimentItemService {

@@ -1,4 +1,4 @@
-package com.mcwendyqueen.model;
+package com.mcwendyqueen.model.condiment;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class MenuItemResponseDTO {
-    private long id;
-
+public class CondimentItemRequestDTO {
     private String name;
 }

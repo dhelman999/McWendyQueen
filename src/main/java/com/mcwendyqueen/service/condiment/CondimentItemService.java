@@ -1,7 +1,7 @@
-package com.mcwendyqueen.service;
+package com.mcwendyqueen.service.condiment;
 
-import com.mcwendyqueen.model.CondimentItem;
-import com.mcwendyqueen.model.CondimentItemRequestDTO;
+import com.mcwendyqueen.model.condiment.CondimentItem;
+import com.mcwendyqueen.model.condiment.CondimentItemRequestDTO;
 
 import java.util.List;
 import java.util.Optional;

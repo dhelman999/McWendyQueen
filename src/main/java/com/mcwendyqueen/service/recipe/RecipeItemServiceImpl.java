@@ -1,26 +1,28 @@
-package com.mcwendyqueen.service;
+package com.mcwendyqueen.service.recipe;
 
-import com.mcwendyqueen.model.CondimentItem;
-import com.mcwendyqueen.model.MenuItem;
+import com.mcwendyqueen.model.condiment.CondimentItem;
+import com.mcwendyqueen.model.menuitem.MenuItem;
 import com.mcwendyqueen.model.ModelMapperUtils;
-import com.mcwendyqueen.model.RecipeItem;
-import com.mcwendyqueen.model.RecipeItemRequestDTO;
-import com.mcwendyqueen.model.RecipeItemResponseDTO;
-import com.mcwendyqueen.model.RecipeRepository;
+import com.mcwendyqueen.model.recipe.RecipeItem;
+import com.mcwendyqueen.model.recipe.RecipeItemRequestDTO;
+import com.mcwendyqueen.model.recipe.RecipeItemResponseDTO;
+import com.mcwendyqueen.model.recipe.RecipeRepository;
+import com.mcwendyqueen.service.condiment.CondimentItemServiceImpl;
+import com.mcwendyqueen.service.menuitem.MenuItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-import static com.mcwendyqueen.service.CondimentItemServiceImpl.CondimentEnum.CHEESE;
-import static com.mcwendyqueen.service.CondimentItemServiceImpl.CondimentEnum.LETTUCE;
-import static com.mcwendyqueen.service.CondimentItemServiceImpl.CondimentEnum.MUSTARD;
-import static com.mcwendyqueen.service.CondimentItemServiceImpl.CondimentEnum.ONIONS;
-import static com.mcwendyqueen.service.CondimentItemServiceImpl.CondimentEnum.PICKLES;
-import static com.mcwendyqueen.service.CondimentItemServiceImpl.CondimentEnum.TOMATOES;
-import static com.mcwendyqueen.service.MenuItemServiceImpl.MenuItemEnum.CHEESEBURGER;
-import static com.mcwendyqueen.service.MenuItemServiceImpl.MenuItemEnum.SALAD;
+import static com.mcwendyqueen.service.condiment.CondimentItemServiceImpl.CondimentEnum.CHEESE;
+import static com.mcwendyqueen.service.condiment.CondimentItemServiceImpl.CondimentEnum.LETTUCE;
+import static com.mcwendyqueen.service.condiment.CondimentItemServiceImpl.CondimentEnum.MUSTARD;
+import static com.mcwendyqueen.service.condiment.CondimentItemServiceImpl.CondimentEnum.ONIONS;
+import static com.mcwendyqueen.service.condiment.CondimentItemServiceImpl.CondimentEnum.PICKLES;
+import static com.mcwendyqueen.service.condiment.CondimentItemServiceImpl.CondimentEnum.TOMATOES;
+import static com.mcwendyqueen.service.menuitem.MenuItemServiceImpl.MenuItemEnum.CHEESEBURGER;
+import static com.mcwendyqueen.service.menuitem.MenuItemServiceImpl.MenuItemEnum.SALAD;
 
 @Service
 public class RecipeItemServiceImpl implements RecipeItemService {

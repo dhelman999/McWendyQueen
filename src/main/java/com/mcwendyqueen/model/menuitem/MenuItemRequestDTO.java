@@ -1,4 +1,4 @@
-package com.mcwendyqueen.model;
+package com.mcwendyqueen.model.menuitem;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

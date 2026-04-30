@@ -1,4 +1,4 @@
-package com.mcwendyqueen.model;
+package com.mcwendyqueen.model.menuitem;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

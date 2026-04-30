@@ -1,8 +1,8 @@
-package com.mcwendyqueen.service;
+package com.mcwendyqueen.service.menuitem;
 
-import com.mcwendyqueen.model.MenuItem;
-import com.mcwendyqueen.model.MenuItemRepository;
-import com.mcwendyqueen.model.MenuItemRequestDTO;
+import com.mcwendyqueen.model.menuitem.MenuItem;
+import com.mcwendyqueen.model.menuitem.MenuItemRepository;
+import com.mcwendyqueen.model.menuitem.MenuItemRequestDTO;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-import static com.mcwendyqueen.service.MenuItemServiceImpl.MenuItemEnum.CHEESEBURGER;
-import static com.mcwendyqueen.service.MenuItemServiceImpl.MenuItemEnum.FRIES;
-import static com.mcwendyqueen.service.MenuItemServiceImpl.MenuItemEnum.SALAD;
+import static com.mcwendyqueen.service.menuitem.MenuItemServiceImpl.MenuItemEnum.CHEESEBURGER;
+import static com.mcwendyqueen.service.menuitem.MenuItemServiceImpl.MenuItemEnum.FRIES;
+import static com.mcwendyqueen.service.menuitem.MenuItemServiceImpl.MenuItemEnum.SALAD;
 
 @Service
 public class MenuItemServiceImpl implements MenuItemService {
