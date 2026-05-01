@@ -1,12 +1,13 @@
 package com.mcwendyqueen.service.order;
 
 import com.mcwendyqueen.model.condiment.CondimentItem;
-import com.mcwendyqueen.model.condiment.CondimentRepository;
+import com.mcwendyqueen.model.condiment.CondimentItemRequestDTO;
 import com.mcwendyqueen.model.menuitem.MenuItem;
 import com.mcwendyqueen.model.menuitem.MenuItemRequestDTO;
 import com.mcwendyqueen.model.order.Order;
 import com.mcwendyqueen.model.order.OrderRepository;
 import com.mcwendyqueen.model.order.OrderRequestDTO;
+import com.mcwendyqueen.service.condiment.CondimentItemService;
 import com.mcwendyqueen.service.menuitem.MenuItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,14 +20,15 @@ import java.util.Set;
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final MenuItemService menuItemService;
-    private final CondimentRepository condimentRepository;
+    private final CondimentItemService condimentItemService;
     public static final long UNKNOWN_ORDER = -1;
 
     @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository, MenuItemService menuItemService, CondimentRepository condimentRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, MenuItemService menuItemService,
+                            CondimentItemService condimentItemService) {
         this.orderRepository = orderRepository;
         this.menuItemService = menuItemService;
-        this.condimentRepository = condimentRepository;
+        this.condimentItemService = condimentItemService;
     }
 
     @Override
@@ -65,19 +67,131 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Optional<Order> addMenuItem(long orderId, MenuItemRequestDTO menuItem) {
+    public Optional<Order> addCondimentToOrder(Long orderId, CondimentItemRequestDTO newCondiment) {
         Optional<Order> order = orderRepository.findById(orderId);
-        Optional<MenuItem> newMenuItem = menuItemService.getMenuItemByName(menuItem.getName());
+        Optional<CondimentItem> condiment = condimentItemService.getCondimentByName(newCondiment.getName());
 
-        if(order.isEmpty() || newMenuItem.isEmpty()) {
+        if(order.isEmpty() || condiment.isEmpty()) {
+            return order;
+        }
+
+        if(order.get().getBaseMenuItem() == null) {
+            return order;
+        }
+
+        orderRepository.save(hydrateOrder(order.get(), condiment.get()));
+
+        return order;
+    }
+
+    @Override
+    public Optional<Order> addCondimentToOrder(String orderName, CondimentItemRequestDTO newCondiment) {
+        Optional<Order> order = orderRepository.findByName(orderName);
+        Optional<CondimentItem> condiment = condimentItemService.getCondimentByName(newCondiment.getName());
+
+        if(order.isEmpty() || condiment.isEmpty()) {
+            return order;
+        }
+
+        if(order.get().getBaseMenuItem() == null) {
+            return order;
+        }
+
+        orderRepository.save(hydrateOrder(order.get(), condiment.get()));
+
+        return order;
+    }
+
+    @Override
+    public Optional<Order> removeCondimentFromOrder(Long orderId, CondimentItemRequestDTO condimentToRemove) {
+        Optional<Order> order = orderRepository.findById(orderId);
+        Optional<CondimentItem> condiment = condimentItemService.getCondimentByName(condimentToRemove.getName());
+
+        if(order.isEmpty() || condiment.isEmpty()) {
+            return order;
+        }
+
+        order.get().removeCondiment(condiment.get());
+
+        return order;
+    }
+
+    @Override
+    public Optional<Order> removeCondimentFromOrder(String orderName, CondimentItemRequestDTO condimentToRemove) {
+        Optional<Order> order = orderRepository.findByName(orderName);
+        Optional<CondimentItem> condiment = condimentItemService.getCondimentByName(condimentToRemove.getName());
+
+        if(order.isEmpty() || condiment.isEmpty()) {
+            return order;
+        }
+
+        order.get().removeCondiment(condiment.get());
+
+        return order;
+    }
+
+    @Override
+    public Optional<Order> addMenuItemToOrder(Long orderId, MenuItemRequestDTO newMenuItem) {
+        Optional<Order> order = orderRepository.findById(orderId);
+        Optional<MenuItem> menuItem = menuItemService.getMenuItemByName(newMenuItem.getName());
+
+        if(order.isEmpty() || menuItem.isEmpty()) {
+            return order;
+        }
+
+        orderRepository.save(hydrateOrder(order.get(), menuItem.get()));
+
+        return order;
+    }
+
+    @Override
+    public Optional<Order> addMenuItemToOrder(String orderName, MenuItemRequestDTO newMenuItem) {
+        Optional<Order> order = orderRepository.findByName(orderName);
+        Optional<MenuItem> menuItem = menuItemService.getMenuItemByName(newMenuItem.getName());
+
+        if(order.isEmpty() || menuItem.isEmpty()) {
+            return order;
+        }
+
+        orderRepository.save(hydrateOrder(order.get(), menuItem.get()));
+
+        return order;
+    }
+
+    @Override
+    public Optional<Order> removeMenuItemFromOrder(Long orderId, MenuItemRequestDTO menuItemToRemove) {
+        Optional<Order> order = orderRepository.findById(orderId);
+        Optional<MenuItem> menuItem = menuItemService.getMenuItemByName(menuItemToRemove.getName());
+
+        if(order.isEmpty() || menuItem.isEmpty()) {
             return order;
         }
 
         Order currentOrder = order.get();
-        MenuItem currentMenuItem = newMenuItem.get();
-        hydrateOrder(currentOrder, currentMenuItem);
+        currentOrder.setBaseMenuItem(null);
+        currentOrder.getCondiments().clear();
 
-        return Optional.of(currentOrder);
+        orderRepository.save(currentOrder);
+
+        return order;
+    }
+
+    @Override
+    public Optional<Order> removeMenuItemFromOrder(String orderName, MenuItemRequestDTO menuItemToRemove) {
+        Optional<Order> order = orderRepository.findByName(orderName);
+        Optional<MenuItem> menuItem = menuItemService.getMenuItemByName(menuItemToRemove.getName());
+
+        if(order.isEmpty() || menuItem.isEmpty()) {
+            return order;
+        }
+
+        Order currentOrder = order.get();
+        currentOrder.setBaseMenuItem(null);
+        currentOrder.getCondiments().clear();
+
+        orderRepository.save(currentOrder);
+
+        return order;
     }
 
     @Override
@@ -85,6 +199,13 @@ public class OrderServiceImpl implements OrderService {
         Optional<Order> order = orderRepository.findByName(name);
 
         return order.map(Order::getId).orElse(UNKNOWN_ORDER);
+    }
+
+    private Order hydrateOrder(Order currentOrder, CondimentItem currentCondiment) {
+        Set<CondimentItem> condiments = currentOrder.getCondiments();
+        condiments.add(currentCondiment);
+
+        return currentOrder;
     }
 
     public Order createOrder(String name) {
@@ -101,10 +222,12 @@ public class OrderServiceImpl implements OrderService {
         return newOrder;
     }
 
-    private void hydrateOrder(Order currentOrder, MenuItem currentMenuItem) {
+    private Order hydrateOrder(Order currentOrder, MenuItem currentMenuItem) {
         Set<CondimentItem> orderCondiments = currentOrder.getCondiments();
         currentOrder.setBaseMenuItem(currentMenuItem);
-        List<CondimentItem> condiments = condimentRepository.findAllCondimentItemsForMenuItem(currentMenuItem.getId());
+        List<CondimentItem> condiments = condimentItemService.findAllCondimentItemsForMenuItem(currentMenuItem.getId());
         orderCondiments.addAll(condiments);
+
+        return currentOrder;
     }
 }

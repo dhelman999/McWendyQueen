@@ -18,4 +18,6 @@ public interface CondimentItemService {
     CondimentItem createCondimentItem(CondimentItemRequestDTO newCondiment);
 
     CondimentItem deleteCondimentItem(CondimentItemRequestDTO condiment);
+
+    List<CondimentItem> findAllCondimentItemsForMenuItem(Long menuId);
 }

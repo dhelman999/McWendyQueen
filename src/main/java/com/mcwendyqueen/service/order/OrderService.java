@@ -1,5 +1,6 @@
 package com.mcwendyqueen.service.order;
 
+import com.mcwendyqueen.model.condiment.CondimentItemRequestDTO;
 import com.mcwendyqueen.model.menuitem.MenuItemRequestDTO;
 import com.mcwendyqueen.model.order.Order;
 import com.mcwendyqueen.model.order.OrderRequestDTO;
@@ -20,5 +21,19 @@ public interface OrderService {
 
     Order deleteOrder(OrderRequestDTO order);
 
-    Optional<Order> addMenuItem(long orderId, MenuItemRequestDTO menuItem);
+    Optional<Order> addCondimentToOrder(Long orderId, CondimentItemRequestDTO newCondiment);
+
+    Optional<Order> addCondimentToOrder(String orderName, CondimentItemRequestDTO newCondiment);
+
+    Optional<Order> removeCondimentFromOrder(Long orderId, CondimentItemRequestDTO condimentToRemove);
+
+    Optional<Order> removeCondimentFromOrder(String orderName, CondimentItemRequestDTO condimentToRemove);
+
+    Optional<Order> addMenuItemToOrder(Long orderId, MenuItemRequestDTO newMenuItem);
+
+    Optional<Order> addMenuItemToOrder(String orderName, MenuItemRequestDTO newMenuItem);
+
+    Optional<Order> removeMenuItemFromOrder(Long orderId, MenuItemRequestDTO menuItemToRemove);
+
+    Optional<Order> removeMenuItemFromOrder(String orderName, MenuItemRequestDTO menuItemToRemove);
 }

@@ -16,6 +16,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -54,10 +55,18 @@ public class Order {
 
     public Order() {
         createdTime =  System.currentTimeMillis();
+        condiments = new HashSet<>();
     }
 
     public Order(String name) {
         this.name = name;
         createdTime =  System.currentTimeMillis();
+        condiments = new HashSet<>();
+    }
+
+    public CondimentItem removeCondiment(CondimentItem condimentToRemove) {
+        boolean removed = condiments.remove(condimentToRemove);
+
+        return removed ? condimentToRemove : null;
     }
 }

@@ -12,7 +12,12 @@ import com.mcwendyqueen.model.order.OrderResponseDTO;
 import com.mcwendyqueen.model.recipe.RecipeItem;
 import com.mcwendyqueen.model.recipe.RecipeItemRequestDTO;
 import com.mcwendyqueen.model.recipe.RecipeItemResponseDTO;
+import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
+
+import java.util.Collections;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ModelMapperUtils {
     static ModelMapper modelMapper = new ModelMapper();
@@ -42,7 +47,25 @@ public class ModelMapperUtils {
     }
 
     public static OrderResponseDTO GetOrderResponseDTO(Order order) {
-        return modelMapper.map(order, OrderResponseDTO.class);
+        OrderResponseDTO orderResponseDTO = new OrderResponseDTO();
+        orderResponseDTO.setId(order.getId());
+        orderResponseDTO.setName(order.getName());
+        orderResponseDTO.setBaseMenuItem(order.getBaseMenuItem());
+
+        Set<CondimentItemResponseDTO> condimentResponseSet;
+
+        if (order.getCondiments() == null || !Hibernate.isInitialized(order.getCondiments())) {
+            condimentResponseSet = Collections.emptySet();
+        }
+        else {
+            condimentResponseSet = order.getCondiments().stream()
+                    .map(ModelMapperUtils::GetCondimentItemResponseDTO)
+                    .collect(Collectors.toSet());
+        }
+
+        orderResponseDTO.setCondiments(condimentResponseSet);
+
+        return orderResponseDTO;
     }
 
     public static RecipeItemResponseDTO GetRecipeItemResponseDTO(RecipeItem recipeItem) {

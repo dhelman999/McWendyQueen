@@ -88,6 +88,11 @@ public class CondimentItemServiceImpl implements  CondimentItemService {
     }
 
     @Override
+    public List<CondimentItem> findAllCondimentItemsForMenuItem(Long menuId) {
+        return condimentRepository.findAllCondimentItemsForMenuItem(menuId);
+    }
+
+    @Override
     public long getCondimentItemIdByName(String name) {
         Optional<CondimentItem> condimentItems = condimentRepository.findByName(name);
 
