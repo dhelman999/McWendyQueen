@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -65,7 +66,7 @@ public class OrdersController {
         Order createdOrder = orderService.createOrder(newOrder);
         OrderResponseDTO orderResponse = ModelMapperUtils.GetOrderResponseDTO(createdOrder);
 
-        return new ResponseEntity<>(orderResponse, HttpStatus.OK);
+        return new ResponseEntity<>(orderResponse, HttpStatus.CREATED);
     }
 
     @DeleteMapping(ORDER_PATH)
@@ -73,6 +74,11 @@ public class OrdersController {
     @ApiResponse(responseCode = "200", description = "Deleted order returned successfully")
     public ResponseEntity<OrderResponseDTO> deleteOrder(@Valid @RequestBody OrderRequestDTO order) {
         Order deletedOrder = orderService.deleteOrder(order);
+
+        if (deletedOrder == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
+        }
+
         OrderResponseDTO orderResponse = ModelMapperUtils.GetOrderResponseDTO(deletedOrder);
 
         return new ResponseEntity<>(orderResponse, HttpStatus.OK);

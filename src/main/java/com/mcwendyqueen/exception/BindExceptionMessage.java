@@ -1,5 +1,6 @@
 package com.mcwendyqueen.exception;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.support.WebExchangeBindException;
@@ -22,6 +23,12 @@ public class BindExceptionMessage extends BaseExceptionMessage {
     @Override
     public void setMessage() {
         message = "Request binding failed. Check the errors field for details.";
+    }
+
+    @Override
+    public void initStatus() {
+        code = HttpStatus.BAD_REQUEST.value();
+        status = HttpStatus.BAD_REQUEST.getReasonPhrase();
     }
 
     /**

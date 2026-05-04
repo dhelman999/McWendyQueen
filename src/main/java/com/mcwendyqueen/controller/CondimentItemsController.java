@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -52,12 +53,12 @@ public class CondimentItemsController {
 
     @PostMapping(CONDIMENT_PATH)
     @Operation(summary = "Create a new condiment", description = "Creates and saves a new condiment.")
-    @ApiResponse(responseCode = "200", description = "Created condiment returned successfully")
+    @ApiResponse(responseCode = "201", description = "Created condiment returned successfully")
     public ResponseEntity<CondimentItemResponseDTO> createCondiment(@Valid @RequestBody CondimentItemRequestDTO newCondiment) {
         CondimentItem createdCondiment = condimentItemService.createCondimentItem(newCondiment);
         CondimentItemResponseDTO condimentResponse = ModelMapperUtils.GetCondimentItemResponseDTO(createdCondiment);
 
-        return new ResponseEntity<>(condimentResponse, HttpStatus.OK);
+        return new ResponseEntity<>(condimentResponse, HttpStatus.CREATED);
     }
 
     @DeleteMapping(CONDIMENT_PATH)
@@ -65,6 +66,11 @@ public class CondimentItemsController {
     @ApiResponse(responseCode = "200", description = "Delete condiment returned successfully")
     public ResponseEntity<CondimentItemResponseDTO> deleteCondiment(@Valid @RequestBody CondimentItemRequestDTO condiment) {
         CondimentItem deletedCondiment = condimentItemService.deleteCondimentItem(condiment);
+
+        if (deletedCondiment == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Condiment not found");
+        }
+
         CondimentItemResponseDTO condimentResponse = ModelMapperUtils.GetCondimentItemResponseDTO(deletedCondiment);
 
         return new ResponseEntity<>(condimentResponse, HttpStatus.OK);
