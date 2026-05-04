@@ -23,6 +23,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleUnhandledExceptions(Exception ex) {
         BaseExceptionMessage exceptionMessage = ExceptionFactory.createExceptionMessage(ex);
+
+        // We want to account for 5xx internal errors separately to audit and improve upon.
+        // These will also include the stack trace for debugging purposes
+        if(exceptionMessage.isInternalError()) {
+            exceptionLogger.error(exceptionMessage.toString(), ex);
+        }
+        // Non 5xx logs won't include detailed errors to avoid exposing sensitive data
+        else {
+            log.warn(exceptionMessage.toString(true));
+        }
+
         return new ResponseEntity<>(exceptionMessage.response(), exceptionMessage.getHttpStatus());
     }
 }

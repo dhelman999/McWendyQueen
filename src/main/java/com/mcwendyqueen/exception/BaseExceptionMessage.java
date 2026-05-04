@@ -80,6 +80,10 @@ public class BaseExceptionMessage {
      * Builds the standardized API error shape returned by the handler.
      */
     public Map<String, Object> response() {
+        return response(false);
+    }
+
+    public Map<String, Object> response(boolean excludeErrors) {
         Map<String, Object> response = new HashMap<>();
         response.put("status", getStatus());
         response.put("code", getCode());
@@ -87,8 +91,31 @@ public class BaseExceptionMessage {
         response.put("message", getMessage());
         response.put("timeStamp", getTimeStamp());
         response.put("requestId", getRequestId());
-        response.put("errors", getErrors());
+
+        if(!excludeErrors) {
+            response.put("errors", getErrors());
+        }
 
         return response;
+    }
+
+    public boolean isInternalError() {
+        HttpStatus status = getHttpStatus();
+
+        return status == null || status.is5xxServerError();
+    }
+
+    public String toString() {
+        return toString(false);
+    }
+
+    public String toString(boolean excludeErrors) {
+        StringBuilder toString = new StringBuilder();
+
+        for(Map.Entry<String, Object> entry : response(excludeErrors).entrySet()) {
+            toString.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+        }
+
+        return toString.toString();
     }
 }
