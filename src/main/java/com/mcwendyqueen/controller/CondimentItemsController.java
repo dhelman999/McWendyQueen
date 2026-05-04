@@ -1,18 +1,21 @@
 package com.mcwendyqueen.controller;
 
+import com.mcwendyqueen.model.ModelMapperUtils;
 import com.mcwendyqueen.model.condiment.CondimentItem;
 import com.mcwendyqueen.model.condiment.CondimentItemRequestDTO;
 import com.mcwendyqueen.model.condiment.CondimentItemResponseDTO;
-import com.mcwendyqueen.model.ModelMapperUtils;
 import com.mcwendyqueen.service.condiment.CondimentItemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,6 +27,7 @@ import static com.mcwendyqueen.ApiConstants.V1_PATH;
 
 @Slf4j
 @RestController
+@Validated
 @RequestMapping(API_BASE_PATH + V1_PATH)
 public class CondimentItemsController {
 
@@ -49,7 +53,7 @@ public class CondimentItemsController {
     @PostMapping(CONDIMENT_PATH)
     @Operation(summary = "Create a new condiment", description = "Creates and saves a new condiment.")
     @ApiResponse(responseCode = "200", description = "Created condiment returned successfully")
-    public ResponseEntity<CondimentItemResponseDTO> createCondiment(CondimentItemRequestDTO newCondiment) {
+    public ResponseEntity<CondimentItemResponseDTO> createCondiment(@Valid @RequestBody CondimentItemRequestDTO newCondiment) {
         CondimentItem createdCondiment = condimentItemService.createCondimentItem(newCondiment);
         CondimentItemResponseDTO condimentResponse = ModelMapperUtils.GetCondimentItemResponseDTO(createdCondiment);
 
@@ -59,7 +63,7 @@ public class CondimentItemsController {
     @DeleteMapping(CONDIMENT_PATH)
     @Operation(summary = "Deletes a condiment", description = "Deletes and returns the condiment.")
     @ApiResponse(responseCode = "200", description = "Delete condiment returned successfully")
-    public ResponseEntity<CondimentItemResponseDTO> deleteCondiment(CondimentItemRequestDTO condiment) {
+    public ResponseEntity<CondimentItemResponseDTO> deleteCondiment(@Valid @RequestBody CondimentItemRequestDTO condiment) {
         CondimentItem deletedCondiment = condimentItemService.deleteCondimentItem(condiment);
         CondimentItemResponseDTO condimentResponse = ModelMapperUtils.GetCondimentItemResponseDTO(deletedCondiment);
 

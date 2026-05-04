@@ -5,6 +5,7 @@ import com.mcwendyqueen.model.menuitem.MenuItem;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.NonNull;
 
 import java.util.Set;
 
@@ -14,6 +15,7 @@ import java.util.Set;
 public class OrderResponseDTO {
     private long id;
 
+    @NonNull
     private String name;
 
     private MenuItem baseMenuItem;

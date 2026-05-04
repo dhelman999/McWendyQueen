@@ -13,8 +13,11 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.lang.NonNull;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -29,7 +32,9 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false, length = 25)
+    @NotBlank(message = "name is required")
+    @Size(max = 25, message = "name must be at most 25 characters")
     private String name;
 
     @ManyToOne
@@ -58,7 +63,7 @@ public class Order {
         condiments = new HashSet<>();
     }
 
-    public Order(String name) {
+    public Order(@NonNull String name) {
         this.name = name;
         createdTime =  System.currentTimeMillis();
         condiments = new HashSet<>();

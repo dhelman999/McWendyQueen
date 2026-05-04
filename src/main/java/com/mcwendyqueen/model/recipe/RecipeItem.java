@@ -24,10 +24,10 @@ public class RecipeItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "menu_id")
+    @Column(name = "menu_id", nullable = false)
     private long menuId;
 
-    @Column(name = "condiment_id")
+    @Column(name = "condiment_id", nullable = false)
     private long condimentId;
 
     public RecipeItem(long menuId, long condimentId) {

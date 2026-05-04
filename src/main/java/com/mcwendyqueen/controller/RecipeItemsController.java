@@ -7,12 +7,15 @@ import com.mcwendyqueen.model.recipe.RecipeItemResponseDTO;
 import com.mcwendyqueen.service.recipe.RecipeItemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,6 +28,7 @@ import static com.mcwendyqueen.ApiConstants.V1_PATH;
 
 @Slf4j
 @RestController
+@Validated
 @RequestMapping(API_BASE_PATH + V1_PATH)
 public class RecipeItemsController {
     private final RecipeItemService recipeItemService;
@@ -48,7 +52,7 @@ public class RecipeItemsController {
     @PostMapping(RECIPE_PATH)
     @Operation(summary = "Create a new recipe item", description = "Creates and saves a new recipe item.")
     @ApiResponse(responseCode = "200", description = "Created recipe item returned successfully")
-    public ResponseEntity<RecipeItemResponseDTO> createRecipeItem(RecipeItemRequestDTO newRecipeItem) {
+    public ResponseEntity<RecipeItemResponseDTO> createRecipeItem(@Valid @RequestBody RecipeItemRequestDTO newRecipeItem) {
         RecipeItem createdRecipeItem = recipeItemService.createRecipeItem(newRecipeItem);
         RecipeItemResponseDTO recipeItemResponse = ModelMapperUtils.GetRecipeItemResponseDTO(createdRecipeItem);
 
@@ -58,7 +62,7 @@ public class RecipeItemsController {
     @DeleteMapping(RECIPE_PATH)
     @Operation(summary = "Deletes a recipe item", description = "Deletes and returns the recipe item.")
     @ApiResponse(responseCode = "200", description = "Delete recipe item returned successfully")
-    public ResponseEntity<RecipeItemResponseDTO> deleteRecipeItem(RecipeItemRequestDTO recipeItem) {
+    public ResponseEntity<RecipeItemResponseDTO> deleteRecipeItem(@Valid @RequestBody RecipeItemRequestDTO recipeItem) {
         RecipeItem deletedRecipeItem = recipeItemService.deleteRecipeItem(recipeItem);
         RecipeItemResponseDTO recipeItemResponse = ModelMapperUtils.GetRecipeItemResponseDTO(deletedRecipeItem);
 

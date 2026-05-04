@@ -10,9 +10,12 @@ import com.mcwendyqueen.service.order.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -33,6 +36,7 @@ import static com.mcwendyqueen.ApiConstants.V1_PATH;
 
 @Slf4j
 @RestController
+@Validated
 @RequestMapping(API_BASE_PATH + V1_PATH)
 public class OrdersController {
     private final OrderService orderService;
@@ -77,7 +81,7 @@ public class OrdersController {
     @PatchMapping(ORDER_PATH + CONDIMENTS_PATH + "/{orderId}")
     @Operation(summary = "Adds a condiment to an order", description = "Adds a condiment and returns an order.")
     @ApiResponse(responseCode = "200", description = "Added condiment to order successfully.")
-    public ResponseEntity<OrderResponseDTO> addCondimentToOrder(@PathVariable Long orderId,
+    public ResponseEntity<OrderResponseDTO> addCondimentToOrder(@PathVariable @Positive(message = "orderId must be > 0") Long orderId,
                                                                 @Valid @RequestBody CondimentItemRequestDTO newCondiment) {
         Optional<Order> existingOrder = orderService.addCondimentToOrder(orderId, newCondiment);
         OrderResponseDTO orderResponse = null;
@@ -92,7 +96,7 @@ public class OrdersController {
     @PatchMapping(ORDER_PATH + CONDIMENTS_PATH + "/name/{orderName}")
     @Operation(summary = "Adds a condiment to an order by name", description = "Adds a condiment and returns an order looked up by order name.")
     @ApiResponse(responseCode = "200", description = "Added condiment to order successfully.")
-    public ResponseEntity<OrderResponseDTO> addCondimentToOrderByName(@PathVariable String orderName,
+    public ResponseEntity<OrderResponseDTO> addCondimentToOrderByName(@PathVariable @NotBlank(message = "orderName is required") String orderName,
                                                                       @Valid @RequestBody CondimentItemRequestDTO newCondiment) {
         Optional<Order> existingOrder = orderService.addCondimentToOrder(orderName, newCondiment);
         OrderResponseDTO orderResponse = null;
@@ -107,7 +111,7 @@ public class OrdersController {
     @DeleteMapping(ORDER_PATH + CONDIMENTS_PATH + "/{orderId}")
     @Operation(summary = "Deletes a condiment from an order", description = "Deletes a condiment and returns an order.")
     @ApiResponse(responseCode = "200", description = "Deleted condiment from order successfully.")
-    public ResponseEntity<OrderResponseDTO> deleteCondimentFromOrder(@PathVariable Long orderId,
+    public ResponseEntity<OrderResponseDTO> deleteCondimentFromOrder(@PathVariable @Positive(message = "orderId must be > 0") Long orderId,
                                                                      @Valid @RequestBody CondimentItemRequestDTO newCondiment) {
         Optional<Order> existingOrder = orderService.removeCondimentFromOrder(orderId, newCondiment);
         OrderResponseDTO orderResponse = null;
@@ -122,7 +126,7 @@ public class OrdersController {
     @DeleteMapping(ORDER_PATH + CONDIMENTS_PATH + "/name/{orderName}")
     @Operation(summary = "Deletes a condiment from an order by name", description = "Deletes a condiment and returns an order looked up by order name.")
     @ApiResponse(responseCode = "200", description = "Deleted condiment from order successfully.")
-    public ResponseEntity<OrderResponseDTO> deleteCondimentFromOrderByName(@PathVariable String orderName,
+    public ResponseEntity<OrderResponseDTO> deleteCondimentFromOrderByName(@PathVariable @NotBlank(message = "orderName is required") String orderName,
                                                                            @Valid @RequestBody CondimentItemRequestDTO newCondiment) {
         Optional<Order> existingOrder = orderService.removeCondimentFromOrder(orderName, newCondiment);
         OrderResponseDTO orderResponse = null;
@@ -137,7 +141,7 @@ public class OrdersController {
     @PatchMapping(ORDER_PATH + MENU_ITEM_PATH + "/{orderId}")
     @Operation(summary = "Adds a menu item to an order", description = "Adds a menu item and returns an order.")
     @ApiResponse(responseCode = "200", description = "Added condiment to order successfully.")
-    public ResponseEntity<OrderResponseDTO> addMenuItemToOrder(@PathVariable Long orderId,
+    public ResponseEntity<OrderResponseDTO> addMenuItemToOrder(@PathVariable @Positive(message = "orderId must be > 0") Long orderId,
                                                                @Valid @RequestBody MenuItemRequestDTO newMenuItem) {
         Optional<Order> existingOrder = orderService.addMenuItemToOrder(orderId, newMenuItem);
         OrderResponseDTO orderResponse = null;
@@ -152,7 +156,7 @@ public class OrdersController {
     @PatchMapping(ORDER_PATH + MENU_ITEM_PATH + "/name/{orderName}")
     @Operation(summary = "Adds a menu item to an order by name", description = "Adds a menu item and returns an order looked up by order name.")
     @ApiResponse(responseCode = "200", description = "Added menu item to order successfully.")
-    public ResponseEntity<OrderResponseDTO> addMenuItemToOrderByName(@PathVariable String orderName,
+    public ResponseEntity<OrderResponseDTO> addMenuItemToOrderByName(@PathVariable @NotBlank(message = "orderName is required") String orderName,
                                                                      @Valid @RequestBody MenuItemRequestDTO newMenuItem) {
         Optional<Order> existingOrder = orderService.addMenuItemToOrder(orderName, newMenuItem);
         OrderResponseDTO orderResponse = null;
@@ -167,7 +171,7 @@ public class OrdersController {
     @DeleteMapping(ORDER_PATH + MENU_ITEM_PATH + "/{orderId}")
     @Operation(summary = "Deletes a menu item from an order", description = "Deletes a menu item and returns an order.")
     @ApiResponse(responseCode = "200", description = "Deleted menu item from order successfully.")
-    public ResponseEntity<OrderResponseDTO> deleteMenuItemFromOrder(@PathVariable Long orderId,
+    public ResponseEntity<OrderResponseDTO> deleteMenuItemFromOrder(@PathVariable @Positive(message = "orderId must be > 0") Long orderId,
                                                                     @Valid @RequestBody MenuItemRequestDTO newMenuItem) {
         Optional<Order> existingOrder = orderService.removeMenuItemFromOrder(orderId, newMenuItem);
         OrderResponseDTO orderResponse = null;
@@ -182,7 +186,7 @@ public class OrdersController {
     @DeleteMapping(ORDER_PATH + MENU_ITEM_PATH + "/name/{orderName}")
     @Operation(summary = "Deletes a menu item from an order by name", description = "Deletes a menu item and returns an order looked up by order name.")
     @ApiResponse(responseCode = "200", description = "Deleted menu item from order successfully.")
-    public ResponseEntity<OrderResponseDTO> deleteMenuItemFromOrderByName(@PathVariable String orderName,
+    public ResponseEntity<OrderResponseDTO> deleteMenuItemFromOrderByName(@PathVariable @NotBlank(message = "orderName is required") String orderName,
                                                                           @Valid @RequestBody MenuItemRequestDTO newMenuItem) {
         Optional<Order> existingOrder = orderService.removeMenuItemFromOrder(orderName, newMenuItem);
         OrderResponseDTO orderResponse = null;
