@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,12 +52,12 @@ public class RecipeItemsController {
 
     @PostMapping(RECIPE_PATH)
     @Operation(summary = "Create a new recipe item", description = "Creates and saves a new recipe item.")
-    @ApiResponse(responseCode = "200", description = "Created recipe item returned successfully")
+    @ApiResponse(responseCode = "201", description = "Created recipe item returned successfully")
     public ResponseEntity<RecipeItemResponseDTO> createRecipeItem(@Valid @RequestBody RecipeItemRequestDTO newRecipeItem) {
         RecipeItem createdRecipeItem = recipeItemService.createRecipeItem(newRecipeItem);
         RecipeItemResponseDTO recipeItemResponse = ModelMapperUtils.GetRecipeItemResponseDTO(createdRecipeItem);
 
-        return new ResponseEntity<>(recipeItemResponse, HttpStatus.OK);
+        return new ResponseEntity<>(recipeItemResponse, HttpStatus.CREATED);
     }
 
     @DeleteMapping(RECIPE_PATH)
@@ -64,6 +65,11 @@ public class RecipeItemsController {
     @ApiResponse(responseCode = "200", description = "Delete recipe item returned successfully")
     public ResponseEntity<RecipeItemResponseDTO> deleteRecipeItem(@Valid @RequestBody RecipeItemRequestDTO recipeItem) {
         RecipeItem deletedRecipeItem = recipeItemService.deleteRecipeItem(recipeItem);
+
+        if (deletedRecipeItem == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe not found");
+        }
+
         RecipeItemResponseDTO recipeItemResponse = ModelMapperUtils.GetRecipeItemResponseDTO(deletedRecipeItem);
 
         return new ResponseEntity<>(recipeItemResponse, HttpStatus.OK);

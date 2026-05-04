@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -51,12 +52,12 @@ public class MenuItemsController {
 
     @PostMapping(MENU_PATH)
     @Operation(summary = "Create a new menu item", description = "Creates and saves a new menu item.")
-    @ApiResponse(responseCode = "200", description = "Created menu item returned successfully")
+    @ApiResponse(responseCode = "201", description = "Created menu item returned successfully")
     public ResponseEntity<MenuItemResponseDTO> createMenuItem(@Valid @RequestBody MenuItemRequestDTO newMenuItem) {
         MenuItem createdMenuItem = menuItemService.createMenuItem(newMenuItem);
         MenuItemResponseDTO menuItemResponse = ModelMapperUtils.GetMenuItemResponseDTO(createdMenuItem);
 
-        return new ResponseEntity<>(menuItemResponse, HttpStatus.OK);
+        return new ResponseEntity<>(menuItemResponse, HttpStatus.CREATED);
     }
 
     @DeleteMapping(MENU_PATH)
@@ -64,6 +65,11 @@ public class MenuItemsController {
     @ApiResponse(responseCode = "200", description = "Delete menu item returned successfully")
     public ResponseEntity<MenuItemResponseDTO> deleteMenuItem(@Valid @RequestBody MenuItemRequestDTO menuItem) {
         MenuItem deletedMenuItem = menuItemService.deleteMenuItem(menuItem);
+
+        if (deletedMenuItem == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Menu item not found");
+        }
+
         MenuItemResponseDTO menuItemResponse = ModelMapperUtils.GetMenuItemResponseDTO(deletedMenuItem);
 
         return new ResponseEntity<>(menuItemResponse, HttpStatus.OK);
