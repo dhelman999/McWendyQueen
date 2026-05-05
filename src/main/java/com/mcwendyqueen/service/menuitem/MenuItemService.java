@@ -17,5 +17,9 @@ public interface MenuItemService {
 
     MenuItem createMenuItem(MenuItemRequestDTO newMenuItem);
 
+    Optional<MenuItem> deleteMenuItem(long menuItemId);
+
+    Optional<MenuItem> deleteMenuItem(String menuItemName);
+
     MenuItem deleteMenuItem(MenuItemRequestDTO menuItem);
 }

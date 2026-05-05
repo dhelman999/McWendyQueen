@@ -52,18 +52,34 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order deleteOrder(OrderRequestDTO order) {
-        Long orderId = getOrderIdByName(order.getName());
-
+    public Optional<Order> deleteOrder(Long orderId) {
         Optional<Order> orderToDelete = orderRepository.findById(orderId);
-        Order deletedOrder = null;
 
         if (orderToDelete.isPresent()) {
             orderRepository.deleteById(orderId);
-            deletedOrder = orderToDelete.get();
         }
 
-        return deletedOrder;
+        return orderToDelete;
+    }
+
+    @Override
+    public Optional<Order> deleteOrder(String orderName) {
+        Long orderId = getOrderIdByName(orderName);
+        Optional<Order> orderToDelete = orderRepository.findById(orderId);
+
+        if (orderToDelete.isPresent()) {
+            orderRepository.deleteById(orderId);
+        }
+
+        return orderToDelete;
+    }
+
+    @Override
+    public List<Order> deleteAllOrders() {
+        List<Order> deletedOrders = orderRepository.findAll();
+        orderRepository.deleteAll();
+
+        return deletedOrders;
     }
 
     @Override

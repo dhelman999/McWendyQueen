@@ -48,6 +48,19 @@ public class RecipeItemServiceImpl implements RecipeItemService {
     }
 
     @Override
+    public Optional<RecipeItem> getRecipeItemById(long recipeId) {
+        return recipeRepository.findById(recipeId);
+    }
+
+    @Override
+    public Optional<RecipeItem> getRecipeItemByName(String menuItemName, String condimentName) {
+        long menuId = menuItemService.getMenuItemIdByName(menuItemName);
+        long condimentId = condimentItemService.getCondimentItemIdByName(condimentName);
+
+        return recipeRepository.findByMenuIdAndCondimentId(menuId, condimentId);
+    }
+
+    @Override
     public RecipeItemResponseDTO hydrateRecipeItem(RecipeItem recipeItem) {
         if(recipeItem == null) {
             return null;
@@ -85,6 +98,28 @@ public class RecipeItemServiceImpl implements RecipeItemService {
         recipeRepository.deleteById(existingRecipe.get().getId());
 
         return existingRecipe.get();
+    }
+
+    @Override
+    public Optional<RecipeItem> deleteRecipeItem(long recipeId) {
+        Optional<RecipeItem> recipeToDelete = recipeRepository.findById(recipeId);
+
+        if(recipeToDelete.isPresent()) {
+            recipeRepository.deleteById(recipeId);
+        }
+
+        return recipeToDelete;
+    }
+
+    @Override
+    public Optional<RecipeItem> deleteRecipeItem(String menuItemName, String condimentName) {
+        Optional<RecipeItem> recipeToDelete = getRecipeItemByName(menuItemName, condimentName);
+
+        if(recipeToDelete.isPresent()) {
+            recipeRepository.deleteById(recipeToDelete.get().getId());
+        }
+
+        return recipeToDelete;
     }
 
     private RecipeItem createRecipeItem(String menuItemName, String condimentName) {

@@ -4,6 +4,7 @@ public class ApiConstants {
     // Path Constants
     public static final String API_BASE_PATH = "/api";
     public static final String V1_PATH = "/v1";
+    public static final String NAME_PATH = "/name";
     public static final String MENU_PATH = "/menu";
     public static final String MENU_ITEM_PATH = "/menu-item";
     public static final String CONDIMENT_PATH = "/condiment";

@@ -19,7 +19,11 @@ public interface OrderService {
 
     Order createOrder(OrderRequestDTO newOrder);
 
-    Order deleteOrder(OrderRequestDTO order);
+    Optional<Order> deleteOrder(Long orderId);
+
+    Optional<Order> deleteOrder(String orderName);
+
+    List<Order> deleteAllOrders();
 
     Optional<Order> addCondimentToOrder(Long orderId, CondimentItemRequestDTO newCondiment);
 

@@ -88,6 +88,28 @@ public class CondimentItemServiceImpl implements  CondimentItemService {
     }
 
     @Override
+    public Optional<CondimentItem> deleteCondimentItem(long condimentId) {
+        Optional<CondimentItem> condimentToDelete = condimentRepository.findById(condimentId);
+
+        if(condimentToDelete.isPresent()) {
+            condimentRepository.deleteById(condimentId);
+        }
+
+        return condimentToDelete;
+    }
+
+    @Override
+    public Optional<CondimentItem> deleteCondimentItem(String condimentName) {
+        Optional<CondimentItem> condimentToDelete = condimentRepository.findByName(condimentName);
+
+        if(condimentToDelete.isPresent()) {
+            condimentRepository.deleteById(condimentToDelete.get().getId());
+        }
+
+        return condimentToDelete;
+    }
+
+    @Override
     public List<CondimentItem> findAllCondimentItemsForMenuItem(Long menuId) {
         return condimentRepository.findAllCondimentItemsForMenuItem(menuId);
     }

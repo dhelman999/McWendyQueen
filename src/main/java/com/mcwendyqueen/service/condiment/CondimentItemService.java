@@ -17,6 +17,10 @@ public interface CondimentItemService {
 
     CondimentItem createCondimentItem(CondimentItemRequestDTO newCondiment);
 
+    Optional<CondimentItem> deleteCondimentItem(long condimentId);
+
+    Optional<CondimentItem> deleteCondimentItem(String condimentName);
+
     CondimentItem deleteCondimentItem(CondimentItemRequestDTO condiment);
 
     List<CondimentItem> findAllCondimentItemsForMenuItem(Long menuId);

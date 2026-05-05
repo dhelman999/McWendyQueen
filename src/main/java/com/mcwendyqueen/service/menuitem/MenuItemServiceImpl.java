@@ -80,6 +80,28 @@ public class MenuItemServiceImpl implements MenuItemService {
     }
 
     @Override
+    public Optional<MenuItem> deleteMenuItem(long menuItemId) {
+        Optional<MenuItem> menuItemToDelete = menuItemRepository.findById(menuItemId);
+
+        if (menuItemToDelete.isPresent()) {
+            menuItemRepository.deleteById(menuItemId);
+        }
+
+        return menuItemToDelete;
+    }
+
+    @Override
+    public Optional<MenuItem> deleteMenuItem(String menuItemName) {
+        Optional<MenuItem> menuItemToDelete = menuItemRepository.findByName(menuItemName);
+
+        if (menuItemToDelete.isPresent()) {
+            menuItemRepository.deleteById(menuItemToDelete.get().getId());
+        }
+
+        return menuItemToDelete;
+    }
+
+    @Override
     public long getMenuItemIdByName(String name) {
         Optional<MenuItem> menuItem = menuItemRepository.findByName(name);
 
