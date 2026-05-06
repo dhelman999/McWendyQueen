@@ -59,14 +59,16 @@ public class Order {
     private OrderStatusEnum orderStatus;
 
     public Order() {
-        createdTime =  System.currentTimeMillis();
+        createdTime = System.currentTimeMillis();
         condiments = new HashSet<>();
+        orderStatus = OrderStatusEnum.CREATED;
     }
 
     public Order(@NonNull String name) {
         this.name = name;
         createdTime =  System.currentTimeMillis();
         condiments = new HashSet<>();
+        orderStatus = OrderStatusEnum.CREATED;
     }
 
     public CondimentItem removeCondiment(CondimentItem condimentToRemove) {

@@ -117,7 +117,7 @@ public class OrdersController {
     }
 
     @DeleteMapping(ORDER_PATH + NAME_PATH + "/{orderName}")
-    @Operation(summary = "Deletes an order", description = "Deletes and returns the order.")
+    @Operation(summary = "Deletes an order by name", description = "Deletes and returns the order.")
     @ApiResponse(responseCode = "200", description = "Deleted order returned successfully")
     public ResponseEntity<OrderResponseDTO> deleteOrder(@PathVariable @NotBlank(message = "orderName is required") String orderName) {
         Optional<Order> deletedOrder = orderService.deleteOrder(orderName);

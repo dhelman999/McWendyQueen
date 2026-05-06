@@ -29,3 +29,32 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  kafka:
+    bootstrap-servers: ${KAFKA_BROKER_HOST:localhost}:${KAFKA_BROKER_PORT:9092}
+    producer:
+      acks: 1    # The send isn't complete until acknowledged locally
+      retries: 1 # Retry the message once in the event of a failure, including timeouts
+      batch:     # Size of the batch after compression, in bytes.
+        size: 163840
+      linger:    # Wait for 5ms before sending a request that doesn't meet the batch size.
+        ms: 5    # Request timeout in ms - default 30000
+      request:
+        timeout:
+          ms: 60000
+      max:       # The configuration controls how long KafkaProducer.send() and KafkaProducer.partitionsFor() will block
+        block:
+          ms: 60000
+        request: # "max.request.size" unit is in bytes - set to 5MB (default is 1MB)
+          size: ${KAFKA_PRODUCER_MAX_REQUEST_SIZE:5242880}
+      compression:
+        type: gzip
+      key-serializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonDeserializer
+    consumer:
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+kafka-topics:
+  prod:
+    enabled: true
+    orders-topic: order-events-topic

@@ -1,7 +1,7 @@
 package com.mcwendyqueen.service.order;
 
-import com.mcwendyqueen.model.condiment.CondimentItemRequestDTO;
-import com.mcwendyqueen.model.menuitem.MenuItemRequestDTO;
+import com.mcwendyqueen.kafka.KafkaAppConfig;
+import com.mcwendyqueen.kafka.KafkaMessageProducer;
 import com.mcwendyqueen.model.order.Order;
 import com.mcwendyqueen.model.order.OrderRepository;
 import com.mcwendyqueen.model.order.OrderRequestDTO;
@@ -16,7 +16,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,13 +25,19 @@ class OrderServiceImplTest {
     private MenuItemService menuItemService;
     private CondimentItemService condimentItemService;
     private OrderServiceImpl orderService;
+    private KafkaMessageProducer kafkaMessageProducer;
+    private KafkaAppConfig kafkaAppConfig;
 
     @BeforeEach
     void setUp() {
         orderRepository = Mockito.mock(OrderRepository.class);
         menuItemService = Mockito.mock(MenuItemService.class);
         condimentItemService = Mockito.mock(CondimentItemService.class);
-        orderService = new OrderServiceImpl(orderRepository, menuItemService, condimentItemService);
+        kafkaMessageProducer = Mockito.mock(KafkaMessageProducer.class);
+        kafkaAppConfig = Mockito.mock(KafkaAppConfig.class);
+
+        orderService = new OrderServiceImpl(orderRepository, menuItemService,
+                condimentItemService, kafkaMessageProducer, kafkaAppConfig);
     }
 
     @Test

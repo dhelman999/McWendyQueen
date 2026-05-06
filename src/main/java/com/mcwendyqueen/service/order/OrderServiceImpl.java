@@ -1,10 +1,13 @@
 package com.mcwendyqueen.service.order;
 
+import com.mcwendyqueen.kafka.KafkaAppConfig;
+import com.mcwendyqueen.kafka.KafkaMessageProducer;
 import com.mcwendyqueen.model.condiment.CondimentItem;
 import com.mcwendyqueen.model.condiment.CondimentItemRequestDTO;
 import com.mcwendyqueen.model.menuitem.MenuItem;
 import com.mcwendyqueen.model.menuitem.MenuItemRequestDTO;
 import com.mcwendyqueen.model.order.Order;
+import com.mcwendyqueen.model.order.OrderEventDTO;
 import com.mcwendyqueen.model.order.OrderRepository;
 import com.mcwendyqueen.model.order.OrderRequestDTO;
 import com.mcwendyqueen.service.condiment.CondimentItemService;
@@ -18,17 +21,25 @@ import java.util.Set;
 
 @Service
 public class OrderServiceImpl implements OrderService {
+    public static String SVC_NAME = "/orders-service";
+
     private final OrderRepository orderRepository;
     private final MenuItemService menuItemService;
     private final CondimentItemService condimentItemService;
     public static final long UNKNOWN_ORDER = -1;
 
+    private final KafkaMessageProducer kafkaMessageProducer;
+
+    private final KafkaAppConfig kafkaAppConfig;
+
     @Autowired
     public OrderServiceImpl(OrderRepository orderRepository, MenuItemService menuItemService,
-                            CondimentItemService condimentItemService) {
+                            CondimentItemService condimentItemService, KafkaMessageProducer kafkaMessageProducer, KafkaAppConfig kafkaAppConfig) {
         this.orderRepository = orderRepository;
         this.menuItemService = menuItemService;
         this.condimentItemService = condimentItemService;
+        this.kafkaMessageProducer = kafkaMessageProducer;
+        this.kafkaAppConfig = kafkaAppConfig;
     }
 
     @Override
@@ -235,7 +246,18 @@ public class OrderServiceImpl implements OrderService {
         Order newOrder = new Order(name);
         orderRepository.save(newOrder);
 
+        sendCreatedOrder(newOrder);
+
         return newOrder;
+    }
+
+    private void sendCreatedOrder(Order order) {
+        if(order == null || !kafkaAppConfig.isEnabled()) {
+            return;
+        }
+
+        OrderEventDTO orderEventDTO = new OrderEventDTO(order);
+        kafkaMessageProducer.sendMessage(kafkaAppConfig.getOrdersTopic(), orderEventDTO);
     }
 
     private Order hydrateOrder(Order currentOrder, MenuItem currentMenuItem) {
