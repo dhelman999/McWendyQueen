@@ -3,6 +3,7 @@ package com.mcwendyqueen.model;
 import com.mcwendyqueen.model.condiment.CondimentItem;
 import com.mcwendyqueen.model.condiment.CondimentItemRequestDTO;
 import com.mcwendyqueen.model.condiment.CondimentItemResponseDTO;
+import com.mcwendyqueen.model.kafka.MessageListenerResponseDTO;
 import com.mcwendyqueen.model.menuitem.MenuItem;
 import com.mcwendyqueen.model.menuitem.MenuItemRequestDTO;
 import com.mcwendyqueen.model.menuitem.MenuItemResponseDTO;
@@ -12,9 +13,12 @@ import com.mcwendyqueen.model.order.OrderResponseDTO;
 import com.mcwendyqueen.model.recipe.RecipeItem;
 import com.mcwendyqueen.model.recipe.RecipeItemRequestDTO;
 import com.mcwendyqueen.model.recipe.RecipeItemResponseDTO;
+import org.apache.kafka.common.TopicPartition;
 import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
+import org.springframework.kafka.listener.MessageListenerContainer;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -70,5 +74,29 @@ public class ModelMapperUtils {
 
     public static RecipeItemResponseDTO GetRecipeItemResponseDTO(RecipeItem recipeItem) {
         return modelMapper.map(recipeItem, RecipeItemResponseDTO.class);
+    }
+
+    public static MessageListenerResponseDTO getMessageListenerResponseDTO(MessageListenerContainer listener) {
+        MessageListenerResponseDTO response = new MessageListenerResponseDTO();
+        response.setListenerId(listener.getListenerId());
+        response.setGroupId(listener.getGroupId());
+        response.setRunning(listener.isRunning());
+        response.setPauseRequested(listener.isPauseRequested());
+        response.setContainerPaused(listener.isContainerPaused());
+        response.setInExpectedState(listener.isInExpectedState());
+        response.setAutoStartup(listener.isAutoStartup());
+
+        Collection<TopicPartition> partitions =  listener.getAssignedPartitions();
+
+        if(partitions != null) {
+            response.setAssignedPartitionCount(partitions.size());
+            response.setAssignedPartitions(listener.getAssignedPartitions().stream().map(TopicPartition::toString).toList());
+        }
+        else {
+            response.setAssignedPartitionCount(0);
+            response.setAssignedPartitions(Collections.emptyList());
+        }
+
+        return response;
     }
 }

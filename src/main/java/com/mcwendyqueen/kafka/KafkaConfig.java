@@ -25,7 +25,7 @@ public class KafkaConfig {
                 .build();
     }
 
-    @KafkaListener(id = "listenerId", topics = "#{@kafkaAppConfig.ordersTopic}")
+    @KafkaListener(id = "ordersListener", topics = "#{@kafkaAppConfig.ordersTopic}")
     public void listen(OrderEventDTO orderEvent) {
 
     }
