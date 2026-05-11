@@ -1,11 +1,14 @@
 package com.mcwendyqueen.kafka;
 
+import com.mcwendyqueen.model.order.OrderEventDTO;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.config.TopicBuilder;
 
+@EnableKafka
 @Configuration
 public class KafkaConfig {
     private final KafkaAppConfig kafkaAppConfig;
@@ -22,8 +25,8 @@ public class KafkaConfig {
                 .build();
     }
 
-    @KafkaListener(id = "listenerId", topics = "order_events_topic")
-    public void listen(String in) {
-        System.out.println(in);
+    @KafkaListener(id = "listenerId", topics = "#{@kafkaAppConfig.ordersTopic}")
+    public void listen(OrderEventDTO orderEvent) {
+
     }
 }
