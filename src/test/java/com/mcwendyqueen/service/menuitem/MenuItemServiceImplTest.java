@@ -1,10 +1,12 @@
 package com.mcwendyqueen.service.menuitem;
 
 import com.mcwendyqueen.model.menuitem.MenuItem;
+import com.mcwendyqueen.model.menuitem.MenuItemDurations;
 import com.mcwendyqueen.model.menuitem.MenuItemRepository;
 import com.mcwendyqueen.model.menuitem.MenuItemRequestDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.util.Optional;
@@ -22,6 +24,9 @@ class MenuItemServiceImplTest {
     private MenuItemRepository menuItemRepository;
     private MenuItemServiceImpl menuItemService;
 
+    @Mock
+    MenuItemDurations menuItemDurations;
+
     @BeforeEach
     void setUp() {
         menuItemRepository = Mockito.mock(MenuItemRepository.class);
@@ -29,7 +34,7 @@ class MenuItemServiceImplTest {
         when(menuItemRepository.findByName(anyString())).thenReturn(Optional.empty());
         when(menuItemRepository.save(any(MenuItem.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        menuItemService = new MenuItemServiceImpl(menuItemRepository);
+        menuItemService = new MenuItemServiceImpl(menuItemRepository, menuItemDurations);
         clearInvocations(menuItemRepository);
     }
 
