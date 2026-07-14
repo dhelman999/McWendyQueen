@@ -17,9 +17,7 @@ import org.springframework.web.client.HttpClientErrorException;
 public class ResiliantOrderPolicyEligibilityClient {
 
     private static final int MAX_FAILURE_COUNT = 3;
-
     private static final int MAX_RETRY_COUNT = 2;
-
     private static final int BASE_RETRY_AMOUNT = 1;
 
     private final OrderPolicyEligibilityClient delegate;
@@ -33,32 +31,32 @@ public class ResiliantOrderPolicyEligibilityClient {
     }
 
     public EligibilityStatus checkEligibility(OrderRequestDTO request) {
-        if (this.failedCount >= MAX_FAILURE_COUNT) {
+        if (failedCount >= MAX_FAILURE_COUNT) {
             return EligibilityStatus.MANUAL_REVIEW;
         }
 
         EligibilityStatus status = delegate.checkEligibility(request);
 
         // If we are under the max number of failures, approve the request and reset the count.
-        if (status == EligibilityStatus.APPROVED && this.failedCount < MAX_FAILURE_COUNT) {
-            this.failedCount = 0;
-            this.pendingRequests.remove(request);
+        if (status == EligibilityStatus.APPROVED && failedCount < MAX_FAILURE_COUNT) {
+            failedCount = 0;
+            pendingRequests.remove(request);
 
             return EligibilityStatus.APPROVED;
         }
-        else if (status == EligibilityStatus.DENIED && ++this.failedCount < MAX_FAILURE_COUNT) {
-            Integer requestCount = this.pendingRequests.get(request);
+        else if (status == EligibilityStatus.DENIED && ++failedCount < MAX_FAILURE_COUNT) {
+            Integer requestCount = pendingRequests.get(request);
 
             // TODO havent handled in flight requests
             if (requestCount == null) {
-                this.pendingRequests.put(request, BASE_RETRY_AMOUNT);
+                pendingRequests.put(request, BASE_RETRY_AMOUNT);
 
                 try {
                     EligibilityStatus retryStatus = retry(request, BASE_RETRY_AMOUNT);
 
                     if (retryStatus == EligibilityStatus.APPROVED) {
-                        this.failedCount = 0;
-                        this.pendingRequests.remove(request);
+                        failedCount = 0;
+                        pendingRequests.remove(request);
 
                         return EligibilityStatus.APPROVED;
                     }
@@ -75,14 +73,14 @@ public class ResiliantOrderPolicyEligibilityClient {
                     return EligibilityStatus.MANUAL_REVIEW;
                 }
 
-                this.pendingRequests.put(request, requestCount + 1);
+                pendingRequests.put(request, requestCount + 1);
 
                 try {
                     EligibilityStatus retryStatus = retry(request, requestCount * 2);
 
                     if (retryStatus == EligibilityStatus.APPROVED) {
-                        this.failedCount = 0;
-                        this.pendingRequests.remove(request);
+                        failedCount = 0;
+                        pendingRequests.remove(request);
 
                         return EligibilityStatus.APPROVED;
                     }
