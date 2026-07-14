@@ -1,5 +1,13 @@
 package com.mcwendyqueen.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+
 import com.mcwendyqueen.model.ModelMapperUtils;
 import com.mcwendyqueen.model.recipe.RecipeItem;
 import com.mcwendyqueen.model.recipe.RecipeItemRequestDTO;
@@ -7,10 +15,8 @@ import com.mcwendyqueen.model.recipe.RecipeItemResponseDTO;
 import com.mcwendyqueen.service.recipe.RecipeItemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -23,10 +29,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 import static com.mcwendyqueen.ApiConstants.API_BASE_PATH;
 import static com.mcwendyqueen.ApiConstants.NAME_PATH;
 import static com.mcwendyqueen.ApiConstants.RECIPE_PATH;
@@ -37,6 +39,7 @@ import static com.mcwendyqueen.ApiConstants.V1_PATH;
 @Validated
 @RequestMapping(API_BASE_PATH + V1_PATH)
 public class RecipeItemsController {
+
     private final RecipeItemService recipeItemService;
 
     public RecipeItemsController(RecipeItemService recipeItemService) {
@@ -73,8 +76,10 @@ public class RecipeItemsController {
     @GetMapping(RECIPE_PATH + NAME_PATH + "/{menuItemName}/{condimentName}")
     @Operation(summary = "Get recipe by names", description = "Returns a single recipe by menu item and condiment names.")
     @ApiResponse(responseCode = "200", description = "Recipe returned successfully")
-    public ResponseEntity<RecipeItemResponseDTO> getRecipeItemByName(@PathVariable @NotBlank(message = "menuItemName is required") String menuItemName,
-                                                                     @PathVariable @NotBlank(message = "condimentName is required") String condimentName) {
+    public ResponseEntity<RecipeItemResponseDTO> getRecipeItemByName(
+            @PathVariable @NotBlank(message = "menuItemName is required") String menuItemName,
+            @PathVariable @NotBlank(message = "condimentName is required") String condimentName) {
+
         Optional<RecipeItem> existingRecipe = recipeItemService.getRecipeItemByName(menuItemName, condimentName);
 
         if (existingRecipe.isEmpty()) {
@@ -129,8 +134,10 @@ public class RecipeItemsController {
     @DeleteMapping(RECIPE_PATH + NAME_PATH + "/{menuItemName}/{condimentName}")
     @Operation(summary = "Deletes a recipe by names", description = "Deletes and returns the recipe item.")
     @ApiResponse(responseCode = "200", description = "Delete recipe item returned successfully")
-    public ResponseEntity<RecipeItemResponseDTO> deleteRecipeItemByName(@PathVariable @NotBlank(message = "menuItemName is required") String menuItemName,
-                                                                        @PathVariable @NotBlank(message = "condimentName is required") String condimentName) {
+    public ResponseEntity<RecipeItemResponseDTO> deleteRecipeItemByName(
+            @PathVariable @NotBlank(message = "menuItemName is required") String menuItemName,
+            @PathVariable @NotBlank(message = "condimentName is required") String condimentName) {
+
         Optional<RecipeItem> deletedRecipe = recipeItemService.deleteRecipeItem(menuItemName, condimentName);
 
         if (deletedRecipe.isEmpty()) {

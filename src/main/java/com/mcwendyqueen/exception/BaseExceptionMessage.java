@@ -1,17 +1,15 @@
 package com.mcwendyqueen.exception;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.slf4j.MDC;
+
 import org.springframework.http.HttpStatus;
 
-import java.util.HashMap;
-import java.util.Map;
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 /**
  * Base error payload model used by the global exception handler.
  *
@@ -20,7 +18,11 @@ import java.util.Map;
  * - setMessage(): provide a client-facing summary message.
  * - getErrors(): return structured validation/binding details when applicable.
  */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class BaseExceptionMessage {
+
     public static final String REQUEST_HEADER_ID = "requestId";
 
     protected Exception exception;
@@ -41,17 +43,17 @@ public class BaseExceptionMessage {
      * 4) append common context fields
      */
     public BaseExceptionMessage(Exception ex) {
-        exception = ex;
+        this.exception = ex;
         initStatus();
-        type = ex.getClass().getSimpleName();
+        this.type = ex.getClass().getSimpleName();
         setMessage();
-        timeStamp = String.valueOf(System.currentTimeMillis());
-        requestId = MDC.get(REQUEST_HEADER_ID);
+        this.timeStamp = String.valueOf(System.currentTimeMillis());
+        this.requestId = MDC.get(REQUEST_HEADER_ID);
     }
 
     public void initStatus() {
-        code = HttpStatus.INTERNAL_SERVER_ERROR.value();
-        status = HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase();
+        this.code = HttpStatus.INTERNAL_SERVER_ERROR.value();
+        this.status = HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase();
     }
 
     /**
@@ -59,13 +61,13 @@ public class BaseExceptionMessage {
      * Subclasses should override for domain-specific clarity.
      */
     public void setMessage() {
-        message = "An unexpected error occurred.";
+        this.message = "An unexpected error occurred.";
     }
 
     public HttpStatus getHttpStatus() {
         HttpStatus httpStatus = HttpStatus.resolve(getCode());
 
-        if(httpStatus == null) {
+        if (httpStatus == null) {
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
         }
 
@@ -92,7 +94,7 @@ public class BaseExceptionMessage {
         response.put("timeStamp", getTimeStamp());
         response.put("requestId", getRequestId());
 
-        if(!excludeErrors) {
+        if (!excludeErrors) {
             response.put("errors", getErrors());
         }
 
@@ -105,6 +107,7 @@ public class BaseExceptionMessage {
         return status == null || status.is5xxServerError();
     }
 
+    @Override
     public String toString() {
         return toString(false);
     }
@@ -112,7 +115,7 @@ public class BaseExceptionMessage {
     public String toString(boolean excludeErrors) {
         StringBuilder toString = new StringBuilder();
 
-        for(Map.Entry<String, Object> entry : response(excludeErrors).entrySet()) {
+        for (Map.Entry<String, Object> entry : response(excludeErrors).entrySet()) {
             toString.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
         }
 

@@ -1,14 +1,14 @@
 package com.mcwendyqueen.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.validation.BindException;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.support.WebExchangeBindException;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.support.WebExchangeBindException;
 
 /**
  * Handles Spring binding failures where field-level binding metadata is
@@ -16,19 +16,20 @@ import java.util.Map;
  * WebExchangeBindException).
  */
 public class BindExceptionMessage extends BaseExceptionMessage {
+
     public BindExceptionMessage(Exception ex) {
         super(ex);
     }
 
     @Override
     public void setMessage() {
-        message = "Request binding failed. Check the errors field for details.";
+        this.message = "Request binding failed. Check the errors field for details.";
     }
 
     @Override
     public void initStatus() {
-        code = HttpStatus.BAD_REQUEST.value();
-        status = HttpStatus.BAD_REQUEST.getReasonPhrase();
+        this.code = HttpStatus.BAD_REQUEST.value();
+        this.status = HttpStatus.BAD_REQUEST.getReasonPhrase();
     }
 
     /**
@@ -40,11 +41,13 @@ public class BindExceptionMessage extends BaseExceptionMessage {
         List<Map<String, String>> errorDetails = new ArrayList<>();
         BindingResult result;
 
-        if (exception instanceof BindException be) {
+        if (this.exception instanceof BindException be) {
             result = be.getBindingResult();
-        } else if (exception instanceof WebExchangeBindException we) {
+        }
+        else if (this.exception instanceof WebExchangeBindException we) {
             result = we.getBindingResult();
-        } else {
+        }
+        else {
             return errorDetails;
         }
 

@@ -17,7 +17,7 @@ public interface OrderService {
 
     long getOrderIdByName(String name);
 
-    Order createOrder(OrderRequestDTO newOrder);
+    Order createOrder(OrderRequestDTO newOrder, String idempotencyKey);
 
     Optional<Order> deleteOrder(Long orderId);
 

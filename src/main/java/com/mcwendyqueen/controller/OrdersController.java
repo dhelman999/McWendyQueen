@@ -1,5 +1,13 @@
 package com.mcwendyqueen.controller;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+
 import com.mcwendyqueen.model.ModelMapperUtils;
 import com.mcwendyqueen.model.condiment.CondimentItemRequestDTO;
 import com.mcwendyqueen.model.menuitem.MenuItemRequestDTO;
@@ -9,10 +17,9 @@ import com.mcwendyqueen.model.order.OrderResponseDTO;
 import com.mcwendyqueen.service.order.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -22,13 +29,10 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.mcwendyqueen.ApiConstants.API_BASE_PATH;
 import static com.mcwendyqueen.ApiConstants.CONDIMENTS_PATH;
@@ -42,6 +46,7 @@ import static com.mcwendyqueen.ApiConstants.V1_PATH;
 @Validated
 @RequestMapping(API_BASE_PATH + V1_PATH)
 public class OrdersController {
+
     private final OrderService orderService;
 
     public OrdersController(OrderService orderService) {
@@ -94,8 +99,11 @@ public class OrdersController {
     @PostMapping(ORDER_PATH)
     @Operation(summary = "Create a new order", description = "Creates and saves a new order.")
     @ApiResponse(responseCode = "201", description = "Created order returned successfully")
-    public ResponseEntity<OrderResponseDTO> createOrder(@Valid @RequestBody OrderRequestDTO newOrder) {
-        Order createdOrder = orderService.createOrder(newOrder);
+    public ResponseEntity<OrderResponseDTO> createOrder(
+            @RequestHeader(name = "Idempotency-Key", required = false) String idempotencyKey,
+            @Valid @RequestBody OrderRequestDTO newOrder) {
+
+        Order createdOrder = orderService.createOrder(newOrder, idempotencyKey);
         OrderResponseDTO orderResponse = ModelMapperUtils.GetOrderResponseDTO(createdOrder);
 
         return new ResponseEntity<>(orderResponse, HttpStatus.CREATED);
@@ -146,14 +154,18 @@ public class OrdersController {
     @PatchMapping(ORDER_PATH + CONDIMENTS_PATH + "/{orderId}")
     @Operation(summary = "Adds a condiment to an order", description = "Adds a condiment and returns an order.")
     @ApiResponse(responseCode = "200", description = "Added condiment to order successfully.")
-    public ResponseEntity<OrderResponseDTO> addCondimentToOrder(@PathVariable @Positive(message = "orderId must be > 0") Long orderId,
-                                                                @Valid @RequestBody CondimentItemRequestDTO newCondiment) {
-        Optional<Order> existingOrder = orderService.addCondimentToOrder(orderId, newCondiment);
-        OrderResponseDTO orderResponse = null;
+    public ResponseEntity<OrderResponseDTO> addCondimentToOrder(
+            @PathVariable @Positive(message = "orderId must be > 0") Long orderId,
+            @Valid @RequestBody CondimentItemRequestDTO newCondiment) {
 
-        if(existingOrder.isPresent()) {
-            orderResponse = ModelMapperUtils.GetOrderResponseDTO(existingOrder.get());
+        Optional<Order> existingOrder = orderService.addCondimentToOrder(orderId, newCondiment);
+        OrderResponseDTO orderResponse;
+
+        if (existingOrder.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
         }
+
+        orderResponse = ModelMapperUtils.GetOrderResponseDTO(existingOrder.get());
 
         return new ResponseEntity<>(orderResponse, HttpStatus.OK);
     }
@@ -161,14 +173,18 @@ public class OrdersController {
     @PatchMapping(ORDER_PATH + CONDIMENTS_PATH + NAME_PATH + "/{orderName}")
     @Operation(summary = "Adds a condiment to an order by name", description = "Adds a condiment and returns an order looked up by order name.")
     @ApiResponse(responseCode = "200", description = "Added condiment to order successfully.")
-    public ResponseEntity<OrderResponseDTO> addCondimentToOrderByName(@PathVariable @NotBlank(message = "orderName is required") String orderName,
-                                                                      @Valid @RequestBody CondimentItemRequestDTO newCondiment) {
-        Optional<Order> existingOrder = orderService.addCondimentToOrder(orderName, newCondiment);
-        OrderResponseDTO orderResponse = null;
+    public ResponseEntity<OrderResponseDTO> addCondimentToOrderByName(
+            @PathVariable @NotBlank(message = "orderName is required") String orderName,
+            @Valid @RequestBody CondimentItemRequestDTO newCondiment) {
 
-        if(existingOrder.isPresent()) {
-            orderResponse = ModelMapperUtils.GetOrderResponseDTO(existingOrder.get());
+        Optional<Order> existingOrder = orderService.addCondimentToOrder(orderName, newCondiment);
+        OrderResponseDTO orderResponse;
+
+        if (existingOrder.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
         }
+
+        orderResponse = ModelMapperUtils.GetOrderResponseDTO(existingOrder.get());
 
         return new ResponseEntity<>(orderResponse, HttpStatus.OK);
     }
@@ -176,14 +192,18 @@ public class OrdersController {
     @DeleteMapping(ORDER_PATH + CONDIMENTS_PATH + "/{orderId}")
     @Operation(summary = "Deletes a condiment from an order", description = "Deletes a condiment and returns an order.")
     @ApiResponse(responseCode = "200", description = "Deleted condiment from order successfully.")
-    public ResponseEntity<OrderResponseDTO> deleteCondimentFromOrder(@PathVariable @Positive(message = "orderId must be > 0") Long orderId,
-                                                                     @Valid @RequestBody CondimentItemRequestDTO newCondiment) {
-        Optional<Order> existingOrder = orderService.removeCondimentFromOrder(orderId, newCondiment);
-        OrderResponseDTO orderResponse = null;
+    public ResponseEntity<OrderResponseDTO> deleteCondimentFromOrder(
+            @PathVariable @Positive(message = "orderId must be > 0") Long orderId,
+            @Valid @NonNull @RequestBody CondimentItemRequestDTO newCondiment) {
 
-        if(existingOrder.isPresent()) {
-            orderResponse = ModelMapperUtils.GetOrderResponseDTO(existingOrder.get());
+        Optional<Order> existingOrder = orderService.removeCondimentFromOrder(orderId, newCondiment);
+        OrderResponseDTO orderResponse;
+
+        if (existingOrder.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
         }
+
+        orderResponse = ModelMapperUtils.GetOrderResponseDTO(existingOrder.get());
 
         return new ResponseEntity<>(orderResponse, HttpStatus.OK);
     }
@@ -191,14 +211,18 @@ public class OrdersController {
     @DeleteMapping(ORDER_PATH + CONDIMENTS_PATH + NAME_PATH + "/{orderName}")
     @Operation(summary = "Deletes a condiment from an order by name", description = "Deletes a condiment and returns an order looked up by order name.")
     @ApiResponse(responseCode = "200", description = "Deleted condiment from order successfully.")
-    public ResponseEntity<OrderResponseDTO> deleteCondimentFromOrderByName(@PathVariable @NotBlank(message = "orderName is required") String orderName,
-                                                                           @Valid @RequestBody CondimentItemRequestDTO newCondiment) {
-        Optional<Order> existingOrder = orderService.removeCondimentFromOrder(orderName, newCondiment);
-        OrderResponseDTO orderResponse = null;
+    public ResponseEntity<OrderResponseDTO> deleteCondimentFromOrderByName(
+            @PathVariable @NotBlank(message = "orderName is required") String orderName,
+            @Valid @NonNull @RequestBody CondimentItemRequestDTO newCondiment) {
 
-        if(existingOrder.isPresent()) {
-            orderResponse = ModelMapperUtils.GetOrderResponseDTO(existingOrder.get());
+        Optional<Order> existingOrder = orderService.removeCondimentFromOrder(orderName, newCondiment);
+        OrderResponseDTO orderResponse;
+
+        if (existingOrder.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
         }
+
+        orderResponse = ModelMapperUtils.GetOrderResponseDTO(existingOrder.get());
 
         return new ResponseEntity<>(orderResponse, HttpStatus.OK);
     }
@@ -206,14 +230,18 @@ public class OrdersController {
     @PatchMapping(ORDER_PATH + MENU_ITEM_PATH + "/{orderId}")
     @Operation(summary = "Adds a menu item to an order", description = "Adds a menu item and returns an order.")
     @ApiResponse(responseCode = "200", description = "Added condiment to order successfully.")
-    public ResponseEntity<OrderResponseDTO> addMenuItemToOrder(@PathVariable @Positive(message = "orderId must be > 0") Long orderId,
-                                                               @Valid @RequestBody MenuItemRequestDTO newMenuItem) {
-        Optional<Order> existingOrder = orderService.addMenuItemToOrder(orderId, newMenuItem);
-        OrderResponseDTO orderResponse = null;
+    public ResponseEntity<OrderResponseDTO> addMenuItemToOrder(
+            @PathVariable @Positive(message = "orderId must be > 0") Long orderId,
+            @Valid @RequestBody MenuItemRequestDTO newMenuItem) {
 
-        if(existingOrder.isPresent()) {
-            orderResponse = ModelMapperUtils.GetOrderResponseDTO(existingOrder.get());
+        Optional<Order> existingOrder = orderService.addMenuItemToOrder(orderId, newMenuItem);
+        OrderResponseDTO orderResponse;
+
+        if (existingOrder.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
         }
+
+        orderResponse = ModelMapperUtils.GetOrderResponseDTO(existingOrder.get());
 
         return new ResponseEntity<>(orderResponse, HttpStatus.OK);
     }
@@ -221,14 +249,18 @@ public class OrdersController {
     @PatchMapping(ORDER_PATH + MENU_ITEM_PATH + NAME_PATH + "/{orderName}")
     @Operation(summary = "Adds a menu item to an order by name", description = "Adds a menu item and returns an order looked up by order name.")
     @ApiResponse(responseCode = "200", description = "Added menu item to order successfully.")
-    public ResponseEntity<OrderResponseDTO> addMenuItemToOrderByName(@PathVariable @NotBlank(message = "orderName is required") String orderName,
-                                                                     @Valid @RequestBody MenuItemRequestDTO newMenuItem) {
-        Optional<Order> existingOrder = orderService.addMenuItemToOrder(orderName, newMenuItem);
-        OrderResponseDTO orderResponse = null;
+    public ResponseEntity<OrderResponseDTO> addMenuItemToOrderByName(
+            @PathVariable @NotBlank(message = "orderName is required") String orderName,
+            @Valid @RequestBody MenuItemRequestDTO newMenuItem) {
 
-        if(existingOrder.isPresent()) {
-            orderResponse = ModelMapperUtils.GetOrderResponseDTO(existingOrder.get());
+        Optional<Order> existingOrder = orderService.addMenuItemToOrder(orderName, newMenuItem);
+        OrderResponseDTO orderResponse;
+
+        if (existingOrder.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
         }
+
+        orderResponse = ModelMapperUtils.GetOrderResponseDTO(existingOrder.get());
 
         return new ResponseEntity<>(orderResponse, HttpStatus.OK);
     }
@@ -236,14 +268,18 @@ public class OrdersController {
     @DeleteMapping(ORDER_PATH + MENU_ITEM_PATH + "/{orderId}")
     @Operation(summary = "Deletes a menu item from an order", description = "Deletes a menu item and returns an order.")
     @ApiResponse(responseCode = "200", description = "Deleted menu item from order successfully.")
-    public ResponseEntity<OrderResponseDTO> deleteMenuItemFromOrder(@PathVariable @Positive(message = "orderId must be > 0") Long orderId,
-                                                                    @Valid @RequestBody MenuItemRequestDTO newMenuItem) {
-        Optional<Order> existingOrder = orderService.removeMenuItemFromOrder(orderId, newMenuItem);
-        OrderResponseDTO orderResponse = null;
+    public ResponseEntity<OrderResponseDTO> deleteMenuItemFromOrder(
+            @PathVariable @Positive(message = "orderId must be > 0") Long orderId,
+            @Valid @RequestBody MenuItemRequestDTO newMenuItem) {
 
-        if(existingOrder.isPresent()) {
-            orderResponse = ModelMapperUtils.GetOrderResponseDTO(existingOrder.get());
+        Optional<Order> existingOrder = orderService.removeMenuItemFromOrder(orderId, newMenuItem);
+        OrderResponseDTO orderResponse;
+
+        if (existingOrder.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
         }
+
+        orderResponse = ModelMapperUtils.GetOrderResponseDTO(existingOrder.get());
 
         return new ResponseEntity<>(orderResponse, HttpStatus.OK);
     }
@@ -251,14 +287,18 @@ public class OrdersController {
     @DeleteMapping(ORDER_PATH + MENU_ITEM_PATH + NAME_PATH + "/{orderName}")
     @Operation(summary = "Deletes a menu item from an order by name", description = "Deletes a menu item and returns an order looked up by order name.")
     @ApiResponse(responseCode = "200", description = "Deleted menu item from order successfully.")
-    public ResponseEntity<OrderResponseDTO> deleteMenuItemFromOrderByName(@PathVariable @NotBlank(message = "orderName is required") String orderName,
-                                                                          @Valid @RequestBody MenuItemRequestDTO newMenuItem) {
-        Optional<Order> existingOrder = orderService.removeMenuItemFromOrder(orderName, newMenuItem);
-        OrderResponseDTO orderResponse = null;
+    public ResponseEntity<OrderResponseDTO> deleteMenuItemFromOrderByName(
+            @PathVariable @NotBlank(message = "orderName is required") String orderName,
+            @Valid @RequestBody MenuItemRequestDTO newMenuItem) {
 
-        if(existingOrder.isPresent()) {
-            orderResponse = ModelMapperUtils.GetOrderResponseDTO(existingOrder.get());
+        Optional<Order> existingOrder = orderService.removeMenuItemFromOrder(orderName, newMenuItem);
+        OrderResponseDTO orderResponse;
+
+        if (existingOrder.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
         }
+
+        orderResponse = ModelMapperUtils.GetOrderResponseDTO(existingOrder.get());
 
         return new ResponseEntity<>(orderResponse, HttpStatus.OK);
     }

@@ -18,15 +18,15 @@ public class NonHttpExceptionMessage extends BaseExceptionMessage {
 
     @Override
     public void setMessage() {
-        if(exception instanceof ValidationException ||
+        if (exception instanceof ValidationException ||
            exception instanceof HttpMessageNotReadableException) {
             message = "Request body or parameters are invalid.";
         }
-        else if(exception instanceof DataIntegrityViolationException ||
+        else if (exception instanceof DataIntegrityViolationException ||
                 exception instanceof OptimisticLockingFailureException) {
             message = "Request conflicts with current resource state.";
         }
-        else if(exception instanceof EmptyResultDataAccessException) {
+        else if (exception instanceof EmptyResultDataAccessException) {
             message = "Requested resource was not found.";
         }
         else {
@@ -39,15 +39,15 @@ public class NonHttpExceptionMessage extends BaseExceptionMessage {
      */
     @Override
     public void initStatus() {
-        if(exception instanceof ValidationException ||
+        if (exception instanceof ValidationException ||
            exception instanceof HttpMessageNotReadableException) {
             code = HttpStatus.BAD_REQUEST.value();
         }
-        else if(exception instanceof DataIntegrityViolationException ||
+        else if (exception instanceof DataIntegrityViolationException ||
                 exception instanceof OptimisticLockingFailureException) {
             code = HttpStatus.CONFLICT.value();
         }
-        else if(exception instanceof EmptyResultDataAccessException) {
+        else if (exception instanceof EmptyResultDataAccessException) {
             code = HttpStatus.NOT_FOUND.value();
         }
         else {

@@ -1,15 +1,17 @@
 package com.mcwendyqueen.service.condiment;
 
+import java.util.List;
+import java.util.Optional;
+
+import lombok.Getter;
+
+import com.mcwendyqueen.model.ModelMapperUtils;
 import com.mcwendyqueen.model.condiment.CondimentItem;
 import com.mcwendyqueen.model.condiment.CondimentItemRequestDTO;
 import com.mcwendyqueen.model.condiment.CondimentRepository;
-import com.mcwendyqueen.model.ModelMapperUtils;
-import lombok.Getter;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 import static com.mcwendyqueen.service.condiment.CondimentItemServiceImpl.CondimentEnum.CHEESE;
 import static com.mcwendyqueen.service.condiment.CondimentItemServiceImpl.CondimentEnum.KETCHUP;
@@ -20,10 +22,11 @@ import static com.mcwendyqueen.service.condiment.CondimentItemServiceImpl.Condim
 import static com.mcwendyqueen.service.condiment.CondimentItemServiceImpl.CondimentEnum.TOMATOES;
 
 @Service
-public class CondimentItemServiceImpl implements  CondimentItemService {
-    private final CondimentRepository condimentRepository;
+public class CondimentItemServiceImpl implements CondimentItemService {
 
     public static final long UNKNOWN_CONDIMENT_ITEM = -1;
+
+    private final CondimentRepository condimentRepository;
 
     @Getter
     public enum CondimentEnum {
@@ -43,7 +46,7 @@ public class CondimentItemServiceImpl implements  CondimentItemService {
 
         @Override
         public String toString() {
-            return shortName;
+            return this.shortName;
         }
     }
 
@@ -60,9 +63,10 @@ public class CondimentItemServiceImpl implements  CondimentItemService {
 
     @Override
     public CondimentItem createCondimentItem(CondimentItemRequestDTO newCondiment) {
-        Optional<CondimentItem> existingCondiment = condimentRepository.findByName(newCondiment.getName());
+        Optional<CondimentItem> existingCondiment =
+                condimentRepository.findByName(newCondiment.getName());
 
-        if(existingCondiment.isPresent()) {
+        if (existingCondiment.isPresent()) {
             // need to throw some problem or log
             return existingCondiment.get();
         }
@@ -75,11 +79,10 @@ public class CondimentItemServiceImpl implements  CondimentItemService {
     @Override
     public CondimentItem deleteCondimentItem(CondimentItemRequestDTO condiment) {
         Long condimentId = getCondimentItemIdByName(condiment.getName());
-
         Optional<CondimentItem> condimentToDelete = condimentRepository.findById(condimentId);
         CondimentItem deletedCondiment = null;
 
-        if(condimentToDelete.isPresent()) {
+        if (condimentToDelete.isPresent()) {
             condimentRepository.deleteById(condimentId);
             deletedCondiment = condimentToDelete.get();
         }
@@ -91,7 +94,7 @@ public class CondimentItemServiceImpl implements  CondimentItemService {
     public Optional<CondimentItem> deleteCondimentItem(long condimentId) {
         Optional<CondimentItem> condimentToDelete = condimentRepository.findById(condimentId);
 
-        if(condimentToDelete.isPresent()) {
+        if (condimentToDelete.isPresent()) {
             condimentRepository.deleteById(condimentId);
         }
 
@@ -102,7 +105,7 @@ public class CondimentItemServiceImpl implements  CondimentItemService {
     public Optional<CondimentItem> deleteCondimentItem(String condimentName) {
         Optional<CondimentItem> condimentToDelete = condimentRepository.findByName(condimentName);
 
-        if(condimentToDelete.isPresent()) {
+        if (condimentToDelete.isPresent()) {
             condimentRepository.deleteById(condimentToDelete.get().getId());
         }
 
@@ -119,7 +122,6 @@ public class CondimentItemServiceImpl implements  CondimentItemService {
         Optional<CondimentItem> condimentItems = condimentRepository.findByName(name);
 
         return condimentItems.map(CondimentItem::getId).orElse(UNKNOWN_CONDIMENT_ITEM);
-
     }
 
     @Override
@@ -135,12 +137,13 @@ public class CondimentItemServiceImpl implements  CondimentItemService {
     public CondimentItem createCondimentItem(String name) {
         Optional<CondimentItem> existingCondiment = condimentRepository.findByName(name);
 
-        if(existingCondiment.isPresent()) {
+        if (existingCondiment.isPresent()) {
             // need to throw some problem or log
             return existingCondiment.get();
         }
 
         CondimentItem newCondiment = new CondimentItem(name);
+
         condimentRepository.save(newCondiment);
 
         return newCondiment;
