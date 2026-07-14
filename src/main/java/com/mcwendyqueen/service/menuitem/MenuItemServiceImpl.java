@@ -1,11 +1,15 @@
 package com.mcwendyqueen.service.menuitem;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import lombok.Getter;
 
 import com.mcwendyqueen.model.menuitem.MenuItem;
+import com.mcwendyqueen.model.menuitem.MenuItemDuration;
+import com.mcwendyqueen.model.menuitem.MenuItemDurations;
 import com.mcwendyqueen.model.menuitem.MenuItemRepository;
 import com.mcwendyqueen.model.menuitem.MenuItemRequestDTO;
 
@@ -23,6 +27,8 @@ public class MenuItemServiceImpl implements MenuItemService {
 
     private final MenuItemRepository menuItemRepository;
 
+    private final MenuItemDurations menuItemDurations;
+
     @Getter
     public enum MenuItemEnum {
         CHEESEBURGER("cheeseburger"),
@@ -30,6 +36,14 @@ public class MenuItemServiceImpl implements MenuItemService {
         SALAD("salad");
 
         private final String shortName;
+
+        private static final Map<String, MenuItemEnum> BY_CODE = new HashMap<>();
+
+        static {
+            for (MenuItemEnum s : values()) {
+                BY_CODE.put(s.shortName, s);
+            }
+        }
 
         MenuItemEnum(String shortName) {
             this.shortName = shortName;
@@ -39,11 +53,16 @@ public class MenuItemServiceImpl implements MenuItemService {
         public String toString() {
             return this.shortName;
         }
+
+        public static MenuItemEnum valueOfCode(String code) {
+            return BY_CODE.get(code);
+        }
     }
 
     @Autowired
-    public MenuItemServiceImpl(MenuItemRepository menuItemRepository) {
+    public MenuItemServiceImpl(MenuItemRepository menuItemRepository, MenuItemDurations menuItemDurations) {
         this.menuItemRepository = menuItemRepository;
+        this.menuItemDurations = menuItemDurations;
         addAllMenuItems();
     }
 
@@ -64,7 +83,13 @@ public class MenuItemServiceImpl implements MenuItemService {
 
     @Override
     public MenuItem createMenuItem(MenuItemRequestDTO newMenuItem) {
-        return createMenuItem(newMenuItem.getName());
+        MenuItemEnum miEnum = MenuItemEnum.valueOfCode(newMenuItem.getName());
+
+        if (miEnum == null) {
+            throw new IllegalArgumentException("Invalid menu item name");
+        }
+
+        return createMenuItem(miEnum);
     }
 
     @Override
@@ -110,15 +135,23 @@ public class MenuItemServiceImpl implements MenuItemService {
         return menuItem.map(MenuItem::getId).orElse(UNKNOWN_MENU_ITEM);
     }
 
-    public MenuItem createMenuItem(String name) {
-        Optional<MenuItem> existingMenuItem = this.menuItemRepository.findByName(name);
+    public MenuItem createMenuItem(MenuItemEnum menuItem) {
+        Optional<MenuItem> existingMenuItem =
+                this.menuItemRepository.findByName(menuItem.getShortName());
 
         if (existingMenuItem.isPresent()) {
             // need to throw some problem or log
             return existingMenuItem.get();
         }
 
-        MenuItem newMenuItem = new MenuItem(name);
+        MenuItem newMenuItem = new MenuItem(menuItem.getShortName());
+        long menuItemDuration = this.menuItemDurations.getMenuItemDuration(menuItem);
+        MenuItemDuration newMenuItemDuration =
+                new MenuItemDuration(newMenuItem.getId(), newMenuItem, menuItemDuration);
+
+        // Set both parent and child relationship
+        newMenuItem.setMiDuration(newMenuItemDuration);
+        newMenuItemDuration.setMenuItem(newMenuItem);
 
         this.menuItemRepository.save(newMenuItem);
 
@@ -126,8 +159,8 @@ public class MenuItemServiceImpl implements MenuItemService {
     }
 
     private void addAllMenuItems() {
-        createMenuItem(CHEESEBURGER.getShortName());
-        createMenuItem(FRIES.getShortName());
-        createMenuItem(SALAD.getShortName());
+        createMenuItem(CHEESEBURGER);
+        createMenuItem(FRIES);
+        createMenuItem(SALAD);
     }
 }

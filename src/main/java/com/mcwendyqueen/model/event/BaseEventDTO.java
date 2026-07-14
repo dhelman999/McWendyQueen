@@ -7,7 +7,7 @@ import java.util.UUID;
 
 @Data
 @AllArgsConstructor
-public class BaseEventDTO {
+public class BaseEventDTO<T> {
     public static String BASE_SVC_NAME = "/services";
 
     private UUID eventId;
@@ -15,8 +15,7 @@ public class BaseEventDTO {
     private Long timestamp;
     private String source;
 
-    // TODO think about the payload
-    private Object payload;
+    private T payload;
 
     public BaseEventDTO() {
         eventId = UUID.randomUUID();

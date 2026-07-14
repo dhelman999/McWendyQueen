@@ -3,8 +3,12 @@ package com.mcwendyqueen.model.order;
 import com.mcwendyqueen.model.event.BaseEventDTO;
 import com.mcwendyqueen.model.event.EventTypes;
 import com.mcwendyqueen.service.order.OrderServiceImpl;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-public class OrderEventDTO extends BaseEventDTO {
+@EqualsAndHashCode(callSuper = true)
+@Data
+public class OrderEventDTO extends BaseEventDTO<OrderEventLightPayload> {
     public OrderEventDTO() {
         super();
         setEventType(EventTypes.ORDER.getShortName());
