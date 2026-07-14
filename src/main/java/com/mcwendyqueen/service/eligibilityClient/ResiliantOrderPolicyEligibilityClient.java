@@ -37,7 +37,7 @@ public class ResiliantOrderPolicyEligibilityClient {
             return EligibilityStatus.MANUAL_REVIEW;
         }
 
-        EligibilityStatus status = this.delegate.checkEligibility(request);
+        EligibilityStatus status = delegate.checkEligibility(request);
 
         // If we are under the max number of failures, approve the request and reset the count.
         if (status == EligibilityStatus.APPROVED && this.failedCount < MAX_FAILURE_COUNT) {
@@ -110,7 +110,7 @@ public class ResiliantOrderPolicyEligibilityClient {
         for (int attempt = 1; attempt <= MAX_RETRY_COUNT; attempt++) {
             Thread.sleep((long) backoffMillis * attempt);
 
-            EligibilityStatus status = this.delegate.checkEligibility(request);
+            EligibilityStatus status = delegate.checkEligibility(request);
 
             if (status == EligibilityStatus.APPROVED) {
                 return status;
@@ -121,7 +121,7 @@ public class ResiliantOrderPolicyEligibilityClient {
     }
 
     public void fallback(OrderRequestDTO request) throws HttpClientErrorException {
-        this.delegate.fallback(request);
+        delegate.fallback(request);
 
         throw new HttpClientErrorException(HttpStatus.SERVICE_UNAVAILABLE,
                 "Service Unavailable for request: " + request);

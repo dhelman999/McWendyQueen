@@ -58,13 +58,13 @@ public class CondimentItemServiceImpl implements CondimentItemService {
 
     @Override
     public List<CondimentItem> getAllCondiments() {
-        return this.condimentRepository.findAll();
+        return condimentRepository.findAll();
     }
 
     @Override
     public CondimentItem createCondimentItem(CondimentItemRequestDTO newCondiment) {
         Optional<CondimentItem> existingCondiment =
-                this.condimentRepository.findByName(newCondiment.getName());
+                condimentRepository.findByName(newCondiment.getName());
 
         if (existingCondiment.isPresent()) {
             // need to throw some problem or log
@@ -73,17 +73,17 @@ public class CondimentItemServiceImpl implements CondimentItemService {
 
         CondimentItem condimentToCreate = ModelMapperUtils.createCondimentItem(newCondiment);
 
-        return this.condimentRepository.save(condimentToCreate);
+        return condimentRepository.save(condimentToCreate);
     }
 
     @Override
     public CondimentItem deleteCondimentItem(CondimentItemRequestDTO condiment) {
         Long condimentId = getCondimentItemIdByName(condiment.getName());
-        Optional<CondimentItem> condimentToDelete = this.condimentRepository.findById(condimentId);
+        Optional<CondimentItem> condimentToDelete = condimentRepository.findById(condimentId);
         CondimentItem deletedCondiment = null;
 
         if (condimentToDelete.isPresent()) {
-            this.condimentRepository.deleteById(condimentId);
+            condimentRepository.deleteById(condimentId);
             deletedCondiment = condimentToDelete.get();
         }
 
@@ -92,10 +92,10 @@ public class CondimentItemServiceImpl implements CondimentItemService {
 
     @Override
     public Optional<CondimentItem> deleteCondimentItem(long condimentId) {
-        Optional<CondimentItem> condimentToDelete = this.condimentRepository.findById(condimentId);
+        Optional<CondimentItem> condimentToDelete = condimentRepository.findById(condimentId);
 
         if (condimentToDelete.isPresent()) {
-            this.condimentRepository.deleteById(condimentId);
+            condimentRepository.deleteById(condimentId);
         }
 
         return condimentToDelete;
@@ -103,10 +103,10 @@ public class CondimentItemServiceImpl implements CondimentItemService {
 
     @Override
     public Optional<CondimentItem> deleteCondimentItem(String condimentName) {
-        Optional<CondimentItem> condimentToDelete = this.condimentRepository.findByName(condimentName);
+        Optional<CondimentItem> condimentToDelete = condimentRepository.findByName(condimentName);
 
         if (condimentToDelete.isPresent()) {
-            this.condimentRepository.deleteById(condimentToDelete.get().getId());
+            condimentRepository.deleteById(condimentToDelete.get().getId());
         }
 
         return condimentToDelete;
@@ -114,28 +114,28 @@ public class CondimentItemServiceImpl implements CondimentItemService {
 
     @Override
     public List<CondimentItem> findAllCondimentItemsForMenuItem(Long menuId) {
-        return this.condimentRepository.findAllCondimentItemsForMenuItem(menuId);
+        return condimentRepository.findAllCondimentItemsForMenuItem(menuId);
     }
 
     @Override
     public long getCondimentItemIdByName(String name) {
-        Optional<CondimentItem> condimentItems = this.condimentRepository.findByName(name);
+        Optional<CondimentItem> condimentItems = condimentRepository.findByName(name);
 
         return condimentItems.map(CondimentItem::getId).orElse(UNKNOWN_CONDIMENT_ITEM);
     }
 
     @Override
     public Optional<CondimentItem> getCondimentByName(String condimentName) {
-        return this.condimentRepository.findByName(condimentName);
+        return condimentRepository.findByName(condimentName);
     }
 
     @Override
     public Optional<CondimentItem> getCondimentItemById(long id) {
-        return this.condimentRepository.findById(id);
+        return condimentRepository.findById(id);
     }
 
     public CondimentItem createCondimentItem(String name) {
-        Optional<CondimentItem> existingCondiment = this.condimentRepository.findByName(name);
+        Optional<CondimentItem> existingCondiment = condimentRepository.findByName(name);
 
         if (existingCondiment.isPresent()) {
             // need to throw some problem or log
@@ -144,7 +144,7 @@ public class CondimentItemServiceImpl implements CondimentItemService {
 
         CondimentItem newCondiment = new CondimentItem(name);
 
-        this.condimentRepository.save(newCondiment);
+        condimentRepository.save(newCondiment);
 
         return newCondiment;
     }

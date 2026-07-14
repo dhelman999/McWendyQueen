@@ -67,23 +67,23 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<Order> getAllOrders() {
-        return this.orderRepository.findAll();
+        return orderRepository.findAll();
     }
 
     @Override
     public Optional<Order> getOrderById(long orderId) {
-        return this.orderRepository.findById(orderId);
+        return orderRepository.findById(orderId);
     }
 
     @Override
     public Optional<Order> getOrderByName(String orderName) {
-        return this.orderRepository.findByName(orderName);
+        return orderRepository.findByName(orderName);
     }
 
     @Override
     public Order createOrder(OrderRequestDTO orderItem, String idempotencyKey) {
         EligibilityStatus eligibilityStatus =
-                this.resiliantOrderPolicyEligibilityClient.checkEligibility(orderItem);
+                resiliantOrderPolicyEligibilityClient.checkEligibility(orderItem);
 
         if (eligibilityStatus == EligibilityStatus.APPROVED) {
             return createOrder(orderItem.getName(), idempotencyKey);
@@ -94,7 +94,7 @@ public class OrderServiceImpl implements OrderService {
             return null;
         }
         else if (eligibilityStatus == EligibilityStatus.MANUAL_REVIEW) {
-            this.resiliantOrderPolicyEligibilityClient.fallback(orderItem);
+            resiliantOrderPolicyEligibilityClient.fallback(orderItem);
         }
 
         return null;
@@ -102,10 +102,10 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Optional<Order> deleteOrder(Long orderId) {
-        Optional<Order> orderToDelete = this.orderRepository.findById(orderId);
+        Optional<Order> orderToDelete = orderRepository.findById(orderId);
 
         if (orderToDelete.isPresent()) {
-            this.orderRepository.deleteById(orderId);
+            orderRepository.deleteById(orderId);
         }
 
         return orderToDelete;
@@ -114,10 +114,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Optional<Order> deleteOrder(String orderName) {
         Long orderId = getOrderIdByName(orderName);
-        Optional<Order> orderToDelete = this.orderRepository.findById(orderId);
+        Optional<Order> orderToDelete = orderRepository.findById(orderId);
 
         if (orderToDelete.isPresent()) {
-            this.orderRepository.deleteById(orderId);
+            orderRepository.deleteById(orderId);
         }
 
         return orderToDelete;
@@ -125,17 +125,17 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<Order> deleteAllOrders() {
-        List<Order> deletedOrders = this.orderRepository.findAll();
+        List<Order> deletedOrders = orderRepository.findAll();
 
-        this.orderRepository.deleteAll();
+        orderRepository.deleteAll();
 
         return deletedOrders;
     }
 
     @Override
     public Optional<Order> addCondimentToOrder(Long orderId, CondimentItemRequestDTO newCondiment) {
-        Optional<Order> order = this.orderRepository.findById(orderId);
-        Optional<CondimentItem> condiment = this.condimentItemService.getCondimentByName(newCondiment.getName());
+        Optional<Order> order = orderRepository.findById(orderId);
+        Optional<CondimentItem> condiment = condimentItemService.getCondimentByName(newCondiment.getName());
 
         if (order.isEmpty() || condiment.isEmpty()) {
             return order;
@@ -145,15 +145,15 @@ public class OrderServiceImpl implements OrderService {
             return order;
         }
 
-        this.orderRepository.save(hydrateOrder(order.get(), condiment.get()));
+        orderRepository.save(hydrateOrder(order.get(), condiment.get()));
 
         return order;
     }
 
     @Override
     public Optional<Order> addCondimentToOrder(String orderName, CondimentItemRequestDTO newCondiment) {
-        Optional<Order> order = this.orderRepository.findByName(orderName);
-        Optional<CondimentItem> condiment = this.condimentItemService.getCondimentByName(newCondiment.getName());
+        Optional<Order> order = orderRepository.findByName(orderName);
+        Optional<CondimentItem> condiment = condimentItemService.getCondimentByName(newCondiment.getName());
 
         if (order.isEmpty() || condiment.isEmpty()) {
             return order;
@@ -163,16 +163,16 @@ public class OrderServiceImpl implements OrderService {
             return order;
         }
 
-        this.orderRepository.save(hydrateOrder(order.get(), condiment.get()));
+        orderRepository.save(hydrateOrder(order.get(), condiment.get()));
 
         return order;
     }
 
     @Override
     public Optional<Order> removeCondimentFromOrder(Long orderId, CondimentItemRequestDTO condimentToRemove) {
-        Optional<Order> order = this.orderRepository.findById(orderId);
+        Optional<Order> order = orderRepository.findById(orderId);
         Optional<CondimentItem> condiment =
-                this.condimentItemService.getCondimentByName(condimentToRemove.getName());
+                condimentItemService.getCondimentByName(condimentToRemove.getName());
 
         if (order.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
@@ -189,16 +189,16 @@ public class OrderServiceImpl implements OrderService {
                     "Condiment does not exist on order " + orderId);
         }
 
-        this.orderRepository.save(order.get());
+        orderRepository.save(order.get());
 
         return order;
     }
 
     @Override
     public Optional<Order> removeCondimentFromOrder(String orderName, CondimentItemRequestDTO condimentToRemove) {
-        Optional<Order> order = this.orderRepository.findByName(orderName);
+        Optional<Order> order = orderRepository.findByName(orderName);
         Optional<CondimentItem> condiment =
-                this.condimentItemService.getCondimentByName(condimentToRemove.getName());
+                condimentItemService.getCondimentByName(condimentToRemove.getName());
 
         if (order.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
@@ -215,43 +215,43 @@ public class OrderServiceImpl implements OrderService {
                     "Condiment does not exist on order: " + orderName);
         }
 
-        this.orderRepository.save(order.get());
+        orderRepository.save(order.get());
 
         return order;
     }
 
     @Override
     public Optional<Order> addMenuItemToOrder(Long orderId, MenuItemRequestDTO newMenuItem) {
-        Optional<Order> order = this.orderRepository.findById(orderId);
-        Optional<MenuItem> menuItem = this.menuItemService.getMenuItemByName(newMenuItem.getName());
+        Optional<Order> order = orderRepository.findById(orderId);
+        Optional<MenuItem> menuItem = menuItemService.getMenuItemByName(newMenuItem.getName());
 
         if (order.isEmpty() || menuItem.isEmpty()) {
             return order;
         }
 
-        this.orderRepository.save(hydrateOrder(order.get(), menuItem.get()));
+        orderRepository.save(hydrateOrder(order.get(), menuItem.get()));
 
         return order;
     }
 
     @Override
     public Optional<Order> addMenuItemToOrder(String orderName, MenuItemRequestDTO newMenuItem) {
-        Optional<Order> order = this.orderRepository.findByName(orderName);
-        Optional<MenuItem> menuItem = this.menuItemService.getMenuItemByName(newMenuItem.getName());
+        Optional<Order> order = orderRepository.findByName(orderName);
+        Optional<MenuItem> menuItem = menuItemService.getMenuItemByName(newMenuItem.getName());
 
         if (order.isEmpty() || menuItem.isEmpty()) {
             return order;
         }
 
-        this.orderRepository.save(hydrateOrder(order.get(), menuItem.get()));
+        orderRepository.save(hydrateOrder(order.get(), menuItem.get()));
 
         return order;
     }
 
     @Override
     public Optional<Order> removeMenuItemFromOrder(Long orderId, MenuItemRequestDTO menuItemToRemove) {
-        Optional<Order> order = this.orderRepository.findById(orderId);
-        Optional<MenuItem> menuItem = this.menuItemService.getMenuItemByName(menuItemToRemove.getName());
+        Optional<Order> order = orderRepository.findById(orderId);
+        Optional<MenuItem> menuItem = menuItemService.getMenuItemByName(menuItemToRemove.getName());
 
         if (order.isEmpty() || menuItem.isEmpty()) {
             return order;
@@ -262,15 +262,15 @@ public class OrderServiceImpl implements OrderService {
         currentOrder.setBaseMenuItem(null);
         currentOrder.getCondiments().clear();
 
-        this.orderRepository.save(currentOrder);
+        orderRepository.save(currentOrder);
 
         return order;
     }
 
     @Override
     public Optional<Order> removeMenuItemFromOrder(String orderName, MenuItemRequestDTO menuItemToRemove) {
-        Optional<Order> order = this.orderRepository.findByName(orderName);
-        Optional<MenuItem> menuItem = this.menuItemService.getMenuItemByName(menuItemToRemove.getName());
+        Optional<Order> order = orderRepository.findByName(orderName);
+        Optional<MenuItem> menuItem = menuItemService.getMenuItemByName(menuItemToRemove.getName());
 
         if (order.isEmpty() || menuItem.isEmpty()) {
             return order;
@@ -281,14 +281,14 @@ public class OrderServiceImpl implements OrderService {
         currentOrder.setBaseMenuItem(null);
         currentOrder.getCondiments().clear();
 
-        this.orderRepository.save(currentOrder);
+        orderRepository.save(currentOrder);
 
         return order;
     }
 
     @Override
     public long getOrderIdByName(String name) {
-        Optional<Order> order = this.orderRepository.findByName(name);
+        Optional<Order> order = orderRepository.findByName(name);
 
         return order.map(Order::getId).orElse(UNKNOWN_ORDER);
     }
@@ -320,7 +320,7 @@ public class OrderServiceImpl implements OrderService {
         newOrder = new Order(name);
 
         try {
-            this.orderRepository.save(newOrder);
+            orderRepository.save(newOrder);
 
             sendCreatedOrder(newOrder);
 
@@ -371,13 +371,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private void sendCreatedOrder(Order order) {
-        if (order == null || !this.kafkaAppConfig.isEnabled()) {
+        if (order == null || !kafkaAppConfig.isEnabled()) {
             return;
         }
 
         OrderEventDTO orderEventDTO = new OrderEventDTO(order);
 
-        this.kafkaMessageProducer.sendMessage(this.kafkaAppConfig.getOrdersTopic(), orderEventDTO);
+        kafkaMessageProducer.sendMessage(kafkaAppConfig.getOrdersTopic(), orderEventDTO);
     }
 
     private Order hydrateOrder(Order currentOrder, MenuItem currentMenuItem) {
@@ -386,7 +386,7 @@ public class OrderServiceImpl implements OrderService {
         currentOrder.setBaseMenuItem(currentMenuItem);
 
         List<CondimentItem> condiments =
-                this.condimentItemService.findAllCondimentItemsForMenuItem(currentMenuItem.getId());
+                condimentItemService.findAllCondimentItemsForMenuItem(currentMenuItem.getId());
 
         orderCondiments.addAll(condiments);
 

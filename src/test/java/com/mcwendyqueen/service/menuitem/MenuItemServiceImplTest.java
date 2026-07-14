@@ -33,20 +33,20 @@ class MenuItemServiceImplTest {
         this.menuItemRepository = Mockito.mock(MenuItemRepository.class);
         this.menuItemDurations = Mockito.mock(MenuItemDurations.class);
 
-        when(this.menuItemRepository.findByName(anyString())).thenReturn(Optional.empty());
-        when(this.menuItemRepository.save(any(MenuItem.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(this.menuItemDurations.getMenuItemDuration(any(MenuItemServiceImpl.MenuItemEnum.class))).thenReturn(60L);
+        when(menuItemRepository.findByName(anyString())).thenReturn(Optional.empty());
+        when(menuItemRepository.save(any(MenuItem.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(menuItemDurations.getMenuItemDuration(any(MenuItemServiceImpl.MenuItemEnum.class))).thenReturn(60L);
 
-        this.menuItemService = new MenuItemServiceImpl(this.menuItemRepository, this.menuItemDurations);
-        clearInvocations(this.menuItemRepository);
+        this.menuItemService = new MenuItemServiceImpl(menuItemRepository, menuItemDurations);
+        clearInvocations(menuItemRepository);
     }
 
     @Test
     void createMenuItem_happyPath_savesAndReturns() {
         MenuItemRequestDTO request = new MenuItemRequestDTO("fries");
 
-        when(this.menuItemRepository.findByName("fries")).thenReturn(Optional.empty());
-        when(this.menuItemRepository.save(any(MenuItem.class))).thenAnswer(invocation -> {
+        when(menuItemRepository.findByName("fries")).thenReturn(Optional.empty());
+        when(menuItemRepository.save(any(MenuItem.class))).thenAnswer(invocation -> {
             MenuItem menuItem = invocation.getArgument(0);
 
             menuItem.setId(9L);
@@ -54,20 +54,20 @@ class MenuItemServiceImplTest {
             return menuItem;
         });
 
-        MenuItem created = this.menuItemService.createMenuItem(request);
+        MenuItem created = menuItemService.createMenuItem(request);
 
         assertEquals(9L, created.getId());
         assertEquals("fries", created.getName());
-        verify(this.menuItemRepository, times(1)).save(any(MenuItem.class));
+        verify(menuItemRepository, times(1)).save(any(MenuItem.class));
     }
 
     @Test
     void getMenuItemById_happyPath_returnsMenuItem() {
         MenuItem existing = new MenuItem(3L, "fries");
 
-        when(this.menuItemRepository.findById(3L)).thenReturn(Optional.of(existing));
+        when(menuItemRepository.findById(3L)).thenReturn(Optional.of(existing));
 
-        Optional<MenuItem> result = this.menuItemService.getMenuItemById(3L);
+        Optional<MenuItem> result = menuItemService.getMenuItemById(3L);
 
         assertTrue(result.isPresent());
         assertEquals("fries", result.get().getName());
@@ -77,12 +77,12 @@ class MenuItemServiceImplTest {
     void deleteMenuItemByName_happyPath_deletesAndReturns() {
         MenuItem existing = new MenuItem(4L, "burger");
 
-        when(this.menuItemRepository.findByName("burger")).thenReturn(Optional.of(existing));
+        when(menuItemRepository.findByName("burger")).thenReturn(Optional.of(existing));
 
-        Optional<MenuItem> deleted = this.menuItemService.deleteMenuItem("burger");
+        Optional<MenuItem> deleted = menuItemService.deleteMenuItem("burger");
 
         assertTrue(deleted.isPresent());
         assertEquals(4L, deleted.get().getId());
-        verify(this.menuItemRepository, times(1)).deleteById(4L);
+        verify(menuItemRepository, times(1)).deleteById(4L);
     }
 }

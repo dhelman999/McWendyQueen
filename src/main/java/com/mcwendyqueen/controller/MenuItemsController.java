@@ -49,7 +49,7 @@ public class MenuItemsController {
     @Operation(summary = "List all menu items", description = "Returns all menu items in the system.")
     @ApiResponse(responseCode = "200", description = "Menu items returned successfully")
     public ResponseEntity<List<MenuItemResponseDTO>> getAllMenuItems() {
-        List<MenuItem> allMenuItems = this.menuItemService.getAllMenuItems();
+        List<MenuItem> allMenuItems = menuItemService.getAllMenuItems();
 
         List<MenuItemResponseDTO> response = allMenuItems.stream()
                 .map(ModelMapperUtils::GetMenuItemResponseDTO)
@@ -64,7 +64,7 @@ public class MenuItemsController {
     public ResponseEntity<MenuItemResponseDTO> getMenuItemById(
             @PathVariable @Positive(message = "menuItemId must be > 0") Long menuItemId) {
 
-        Optional<MenuItem> existingMenuItem = this.menuItemService.getMenuItemById(menuItemId);
+        Optional<MenuItem> existingMenuItem = menuItemService.getMenuItemById(menuItemId);
 
         if (existingMenuItem.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Menu item not found");
@@ -81,7 +81,7 @@ public class MenuItemsController {
     public ResponseEntity<MenuItemResponseDTO> getMenuItemByName(
             @PathVariable @NotBlank(message = "menuItemName is required") String menuItemName) {
 
-        Optional<MenuItem> existingMenuItem = this.menuItemService.getMenuItemByName(menuItemName);
+        Optional<MenuItem> existingMenuItem = menuItemService.getMenuItemByName(menuItemName);
 
         if (existingMenuItem.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Menu item not found");
@@ -96,7 +96,7 @@ public class MenuItemsController {
     @Operation(summary = "Create a new menu item", description = "Creates and saves a new menu item.")
     @ApiResponse(responseCode = "201", description = "Created menu item returned successfully")
     public ResponseEntity<MenuItemResponseDTO> createMenuItem(@Valid @RequestBody MenuItemRequestDTO newMenuItem) {
-        MenuItem createdMenuItem = this.menuItemService.createMenuItem(newMenuItem);
+        MenuItem createdMenuItem = menuItemService.createMenuItem(newMenuItem);
         MenuItemResponseDTO menuItemResponse = ModelMapperUtils.GetMenuItemResponseDTO(createdMenuItem);
 
         return new ResponseEntity<>(menuItemResponse, HttpStatus.CREATED);
@@ -106,7 +106,7 @@ public class MenuItemsController {
     @Operation(summary = "Deletes a menu item", description = "Deletes and returns the menu item.")
     @ApiResponse(responseCode = "200", description = "Delete menu item returned successfully")
     public ResponseEntity<MenuItemResponseDTO> deleteMenuItem(@Valid @RequestBody MenuItemRequestDTO menuItem) {
-        MenuItem deletedMenuItem = this.menuItemService.deleteMenuItem(menuItem);
+        MenuItem deletedMenuItem = menuItemService.deleteMenuItem(menuItem);
 
         if (deletedMenuItem == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Menu item not found");
@@ -123,7 +123,7 @@ public class MenuItemsController {
     public ResponseEntity<MenuItemResponseDTO> deleteMenuItemById(
             @PathVariable @Positive(message = "menuItemId must be > 0") Long menuItemId) {
 
-        Optional<MenuItem> deletedMenuItem = this.menuItemService.deleteMenuItem(menuItemId);
+        Optional<MenuItem> deletedMenuItem = menuItemService.deleteMenuItem(menuItemId);
 
         if (deletedMenuItem.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Menu item not found");
@@ -140,7 +140,7 @@ public class MenuItemsController {
     public ResponseEntity<MenuItemResponseDTO> deleteMenuItemByName(
             @PathVariable @NotBlank(message = "menuItemName is required") String menuItemName) {
 
-        Optional<MenuItem> deletedMenuItem = this.menuItemService.deleteMenuItem(menuItemName);
+        Optional<MenuItem> deletedMenuItem = menuItemService.deleteMenuItem(menuItemName);
 
         if (deletedMenuItem.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Menu item not found");

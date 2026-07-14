@@ -49,7 +49,7 @@ public class CondimentItemsController {
     @Operation(summary = "List all condiments", description = "Returns all condiments in the system.")
     @ApiResponse(responseCode = "200", description = "Condiments returned successfully")
     public ResponseEntity<List<CondimentItemResponseDTO>> getAllCondiments() {
-        List<CondimentItem> allCondiments = this.condimentItemService.getAllCondiments();
+        List<CondimentItem> allCondiments = condimentItemService.getAllCondiments();
 
         List<CondimentItemResponseDTO> response = allCondiments.stream()
                 .map(ModelMapperUtils::GetCondimentItemResponseDTO)
@@ -64,7 +64,7 @@ public class CondimentItemsController {
     public ResponseEntity<CondimentItemResponseDTO> getCondimentById(
             @PathVariable @Positive(message = "condimentId must be > 0") Long condimentId) {
 
-        Optional<CondimentItem> existingCondiment = this.condimentItemService.getCondimentItemById(condimentId);
+        Optional<CondimentItem> existingCondiment = condimentItemService.getCondimentItemById(condimentId);
 
         if (existingCondiment.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Condiment not found");
@@ -81,7 +81,7 @@ public class CondimentItemsController {
     public ResponseEntity<CondimentItemResponseDTO> getCondimentByName(
             @PathVariable @NotBlank(message = "condimentName is required") String condimentName) {
 
-        Optional<CondimentItem> existingCondiment = this.condimentItemService.getCondimentByName(condimentName);
+        Optional<CondimentItem> existingCondiment = condimentItemService.getCondimentByName(condimentName);
 
         if (existingCondiment.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Condiment not found");
@@ -96,7 +96,7 @@ public class CondimentItemsController {
     @Operation(summary = "Create a new condiment", description = "Creates and saves a new condiment.")
     @ApiResponse(responseCode = "201", description = "Created condiment returned successfully")
     public ResponseEntity<CondimentItemResponseDTO> createCondiment(@Valid @RequestBody CondimentItemRequestDTO newCondiment) {
-        CondimentItem createdCondiment = this.condimentItemService.createCondimentItem(newCondiment);
+        CondimentItem createdCondiment = condimentItemService.createCondimentItem(newCondiment);
         CondimentItemResponseDTO condimentResponse = ModelMapperUtils.GetCondimentItemResponseDTO(createdCondiment);
 
         return new ResponseEntity<>(condimentResponse, HttpStatus.CREATED);
@@ -106,7 +106,7 @@ public class CondimentItemsController {
     @Operation(summary = "Deletes a condiment", description = "Deletes and returns the condiment.")
     @ApiResponse(responseCode = "200", description = "Delete condiment returned successfully")
     public ResponseEntity<CondimentItemResponseDTO> deleteCondiment(@Valid @RequestBody CondimentItemRequestDTO condiment) {
-        CondimentItem deletedCondiment = this.condimentItemService.deleteCondimentItem(condiment);
+        CondimentItem deletedCondiment = condimentItemService.deleteCondimentItem(condiment);
 
         if (deletedCondiment == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Condiment not found");
@@ -123,7 +123,7 @@ public class CondimentItemsController {
     public ResponseEntity<CondimentItemResponseDTO> deleteCondimentById(
             @PathVariable @Positive(message = "condimentId must be > 0") Long condimentId) {
 
-        Optional<CondimentItem> deletedCondiment = this.condimentItemService.deleteCondimentItem(condimentId);
+        Optional<CondimentItem> deletedCondiment = condimentItemService.deleteCondimentItem(condimentId);
 
         if (deletedCondiment.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Condiment not found");
@@ -140,7 +140,7 @@ public class CondimentItemsController {
     public ResponseEntity<CondimentItemResponseDTO> deleteCondimentByName(
             @PathVariable @NotBlank(message = "condimentName is required") String condimentName) {
 
-        Optional<CondimentItem> deletedCondiment = this.condimentItemService.deleteCondimentItem(condimentName);
+        Optional<CondimentItem> deletedCondiment = condimentItemService.deleteCondimentItem(condimentName);
 
         if (deletedCondiment.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Condiment not found");

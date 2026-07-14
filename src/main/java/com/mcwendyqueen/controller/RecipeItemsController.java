@@ -50,10 +50,10 @@ public class RecipeItemsController {
     @Operation(summary = "List all recipe items", description = "Returns all recipe items in the system.")
     @ApiResponse(responseCode = "200", description = "Recipe items returned successfully")
     public ResponseEntity<List<RecipeItemResponseDTO>> getAllRecipeItems() {
-        List<RecipeItem> allRecipeItems = this.recipeItemService.getAllRecipeItems();
+        List<RecipeItem> allRecipeItems = recipeItemService.getAllRecipeItems();
 
         List<RecipeItemResponseDTO> response = new ArrayList<>();
-        allRecipeItems.forEach(item -> response.add(this.recipeItemService.hydrateRecipeItem(item)));
+        allRecipeItems.forEach(item -> response.add(recipeItemService.hydrateRecipeItem(item)));
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -62,13 +62,13 @@ public class RecipeItemsController {
     @Operation(summary = "Get recipe by id", description = "Returns a single recipe by id.")
     @ApiResponse(responseCode = "200", description = "Recipe returned successfully")
     public ResponseEntity<RecipeItemResponseDTO> getRecipeItemById(@PathVariable @Positive(message = "recipeId must be > 0") Long recipeId) {
-        Optional<RecipeItem> existingRecipe = this.recipeItemService.getRecipeItemById(recipeId);
+        Optional<RecipeItem> existingRecipe = recipeItemService.getRecipeItemById(recipeId);
 
         if (existingRecipe.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe not found");
         }
 
-        RecipeItemResponseDTO recipeResponse = this.recipeItemService.hydrateRecipeItem(existingRecipe.get());
+        RecipeItemResponseDTO recipeResponse = recipeItemService.hydrateRecipeItem(existingRecipe.get());
 
         return new ResponseEntity<>(recipeResponse, HttpStatus.OK);
     }
@@ -80,13 +80,13 @@ public class RecipeItemsController {
             @PathVariable @NotBlank(message = "menuItemName is required") String menuItemName,
             @PathVariable @NotBlank(message = "condimentName is required") String condimentName) {
 
-        Optional<RecipeItem> existingRecipe = this.recipeItemService.getRecipeItemByName(menuItemName, condimentName);
+        Optional<RecipeItem> existingRecipe = recipeItemService.getRecipeItemByName(menuItemName, condimentName);
 
         if (existingRecipe.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe not found");
         }
 
-        RecipeItemResponseDTO recipeResponse = this.recipeItemService.hydrateRecipeItem(existingRecipe.get());
+        RecipeItemResponseDTO recipeResponse = recipeItemService.hydrateRecipeItem(existingRecipe.get());
 
         return new ResponseEntity<>(recipeResponse, HttpStatus.OK);
     }
@@ -95,7 +95,7 @@ public class RecipeItemsController {
     @Operation(summary = "Create a new recipe item", description = "Creates and saves a new recipe item.")
     @ApiResponse(responseCode = "201", description = "Created recipe item returned successfully")
     public ResponseEntity<RecipeItemResponseDTO> createRecipeItem(@Valid @RequestBody RecipeItemRequestDTO newRecipeItem) {
-        RecipeItem createdRecipeItem = this.recipeItemService.createRecipeItem(newRecipeItem);
+        RecipeItem createdRecipeItem = recipeItemService.createRecipeItem(newRecipeItem);
         RecipeItemResponseDTO recipeItemResponse = ModelMapperUtils.GetRecipeItemResponseDTO(createdRecipeItem);
 
         return new ResponseEntity<>(recipeItemResponse, HttpStatus.CREATED);
@@ -105,7 +105,7 @@ public class RecipeItemsController {
     @Operation(summary = "Deletes a recipe item", description = "Deletes and returns the recipe item.")
     @ApiResponse(responseCode = "200", description = "Delete recipe item returned successfully")
     public ResponseEntity<RecipeItemResponseDTO> deleteRecipeItem(@Valid @RequestBody RecipeItemRequestDTO recipeItem) {
-        RecipeItem deletedRecipeItem = this.recipeItemService.deleteRecipeItem(recipeItem);
+        RecipeItem deletedRecipeItem = recipeItemService.deleteRecipeItem(recipeItem);
 
         if (deletedRecipeItem == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe not found");
@@ -120,13 +120,13 @@ public class RecipeItemsController {
     @Operation(summary = "Deletes a recipe by id", description = "Deletes and returns the recipe item.")
     @ApiResponse(responseCode = "200", description = "Delete recipe item returned successfully")
     public ResponseEntity<RecipeItemResponseDTO> deleteRecipeItemById(@PathVariable @Positive(message = "recipeId must be > 0") Long recipeId) {
-        Optional<RecipeItem> deletedRecipe = this.recipeItemService.deleteRecipeItem(recipeId);
+        Optional<RecipeItem> deletedRecipe = recipeItemService.deleteRecipeItem(recipeId);
 
         if (deletedRecipe.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe not found");
         }
 
-        RecipeItemResponseDTO recipeItemResponse = this.recipeItemService.hydrateRecipeItem(deletedRecipe.get());
+        RecipeItemResponseDTO recipeItemResponse = recipeItemService.hydrateRecipeItem(deletedRecipe.get());
 
         return new ResponseEntity<>(recipeItemResponse, HttpStatus.OK);
     }
@@ -138,13 +138,13 @@ public class RecipeItemsController {
             @PathVariable @NotBlank(message = "menuItemName is required") String menuItemName,
             @PathVariable @NotBlank(message = "condimentName is required") String condimentName) {
 
-        Optional<RecipeItem> deletedRecipe = this.recipeItemService.deleteRecipeItem(menuItemName, condimentName);
+        Optional<RecipeItem> deletedRecipe = recipeItemService.deleteRecipeItem(menuItemName, condimentName);
 
         if (deletedRecipe.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe not found");
         }
 
-        RecipeItemResponseDTO recipeItemResponse = this.recipeItemService.hydrateRecipeItem(deletedRecipe.get());
+        RecipeItemResponseDTO recipeItemResponse = recipeItemService.hydrateRecipeItem(deletedRecipe.get());
 
         return new ResponseEntity<>(recipeItemResponse, HttpStatus.OK);
     }

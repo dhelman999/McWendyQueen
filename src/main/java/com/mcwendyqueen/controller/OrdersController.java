@@ -57,7 +57,7 @@ public class OrdersController {
     @Operation(summary = "List all orders", description = "Returns all orders in the system.")
     @ApiResponse(responseCode = "200", description = "Orders returned successfully")
     public ResponseEntity<List<OrderResponseDTO>> getAllOrders() {
-        List<Order> allOrders = this.orderService.getAllOrders();
+        List<Order> allOrders = orderService.getAllOrders();
 
         List<OrderResponseDTO> response = allOrders.stream()
                 .map(ModelMapperUtils::GetOrderResponseDTO)
@@ -70,7 +70,7 @@ public class OrdersController {
     @Operation(summary = "Get order by id", description = "Returns a single order by id.")
     @ApiResponse(responseCode = "200", description = "Order returned successfully")
     public ResponseEntity<OrderResponseDTO> getOrderById(@PathVariable @Positive(message = "orderId must be > 0") Long orderId) {
-        Optional<Order> existingOrder = this.orderService.getOrderById(orderId);
+        Optional<Order> existingOrder = orderService.getOrderById(orderId);
 
         if (existingOrder.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
@@ -85,7 +85,7 @@ public class OrdersController {
     @Operation(summary = "Get order by name", description = "Returns a single order by name.")
     @ApiResponse(responseCode = "200", description = "Order returned successfully")
     public ResponseEntity<OrderResponseDTO> getOrderByName(@PathVariable @NotBlank(message = "orderName is required") String orderName) {
-        Optional<Order> existingOrder = this.orderService.getOrderByName(orderName);
+        Optional<Order> existingOrder = orderService.getOrderByName(orderName);
 
         if (existingOrder.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
@@ -103,7 +103,7 @@ public class OrdersController {
             @RequestHeader(name = "Idempotency-Key", required = false) String idempotencyKey,
             @Valid @RequestBody OrderRequestDTO newOrder) {
 
-        Order createdOrder = this.orderService.createOrder(newOrder, idempotencyKey);
+        Order createdOrder = orderService.createOrder(newOrder, idempotencyKey);
         OrderResponseDTO orderResponse = ModelMapperUtils.GetOrderResponseDTO(createdOrder);
 
         return new ResponseEntity<>(orderResponse, HttpStatus.CREATED);
@@ -113,7 +113,7 @@ public class OrdersController {
     @Operation(summary = "Deletes an order by id", description = "Deletes and returns the order.")
     @ApiResponse(responseCode = "200", description = "Deleted order returned successfully")
     public ResponseEntity<OrderResponseDTO> deleteOrder(@PathVariable @Positive(message = "orderId must be > 0") Long orderId) {
-        Optional<Order> deletedOrder = this.orderService.deleteOrder(orderId);
+        Optional<Order> deletedOrder = orderService.deleteOrder(orderId);
 
         if (deletedOrder.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
@@ -128,7 +128,7 @@ public class OrdersController {
     @Operation(summary = "Deletes an order by name", description = "Deletes and returns the order.")
     @ApiResponse(responseCode = "200", description = "Deleted order returned successfully")
     public ResponseEntity<OrderResponseDTO> deleteOrder(@PathVariable @NotBlank(message = "orderName is required") String orderName) {
-        Optional<Order> deletedOrder = this.orderService.deleteOrder(orderName);
+        Optional<Order> deletedOrder = orderService.deleteOrder(orderName);
 
         if (deletedOrder.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
@@ -143,7 +143,7 @@ public class OrdersController {
     @Operation(summary = "Deletes all orders", description = "Deletes all orders.")
     @ApiResponse(responseCode = "200", description = "All deleted orders returned successfully.")
     public ResponseEntity<List<OrderResponseDTO>> deleteAllOrders() {
-        List<Order> deletedOrders = this.orderService.deleteAllOrders();
+        List<Order> deletedOrders = orderService.deleteAllOrders();
         List<OrderResponseDTO> ordersResponse = deletedOrders.stream()
                 .map(ModelMapperUtils::GetOrderResponseDTO)
                 .collect(Collectors.toList());
@@ -158,7 +158,7 @@ public class OrdersController {
             @PathVariable @Positive(message = "orderId must be > 0") Long orderId,
             @Valid @RequestBody CondimentItemRequestDTO newCondiment) {
 
-        Optional<Order> existingOrder = this.orderService.addCondimentToOrder(orderId, newCondiment);
+        Optional<Order> existingOrder = orderService.addCondimentToOrder(orderId, newCondiment);
         OrderResponseDTO orderResponse;
 
         if (existingOrder.isEmpty()) {
@@ -177,7 +177,7 @@ public class OrdersController {
             @PathVariable @NotBlank(message = "orderName is required") String orderName,
             @Valid @RequestBody CondimentItemRequestDTO newCondiment) {
 
-        Optional<Order> existingOrder = this.orderService.addCondimentToOrder(orderName, newCondiment);
+        Optional<Order> existingOrder = orderService.addCondimentToOrder(orderName, newCondiment);
         OrderResponseDTO orderResponse;
 
         if (existingOrder.isEmpty()) {
@@ -196,7 +196,7 @@ public class OrdersController {
             @PathVariable @Positive(message = "orderId must be > 0") Long orderId,
             @Valid @NonNull @RequestBody CondimentItemRequestDTO newCondiment) {
 
-        Optional<Order> existingOrder = this.orderService.removeCondimentFromOrder(orderId, newCondiment);
+        Optional<Order> existingOrder = orderService.removeCondimentFromOrder(orderId, newCondiment);
         OrderResponseDTO orderResponse;
 
         if (existingOrder.isEmpty()) {
@@ -215,7 +215,7 @@ public class OrdersController {
             @PathVariable @NotBlank(message = "orderName is required") String orderName,
             @Valid @NonNull @RequestBody CondimentItemRequestDTO newCondiment) {
 
-        Optional<Order> existingOrder = this.orderService.removeCondimentFromOrder(orderName, newCondiment);
+        Optional<Order> existingOrder = orderService.removeCondimentFromOrder(orderName, newCondiment);
         OrderResponseDTO orderResponse;
 
         if (existingOrder.isEmpty()) {
@@ -234,7 +234,7 @@ public class OrdersController {
             @PathVariable @Positive(message = "orderId must be > 0") Long orderId,
             @Valid @RequestBody MenuItemRequestDTO newMenuItem) {
 
-        Optional<Order> existingOrder = this.orderService.addMenuItemToOrder(orderId, newMenuItem);
+        Optional<Order> existingOrder = orderService.addMenuItemToOrder(orderId, newMenuItem);
         OrderResponseDTO orderResponse;
 
         if (existingOrder.isEmpty()) {
@@ -253,7 +253,7 @@ public class OrdersController {
             @PathVariable @NotBlank(message = "orderName is required") String orderName,
             @Valid @RequestBody MenuItemRequestDTO newMenuItem) {
 
-        Optional<Order> existingOrder = this.orderService.addMenuItemToOrder(orderName, newMenuItem);
+        Optional<Order> existingOrder = orderService.addMenuItemToOrder(orderName, newMenuItem);
         OrderResponseDTO orderResponse;
 
         if (existingOrder.isEmpty()) {
@@ -272,7 +272,7 @@ public class OrdersController {
             @PathVariable @Positive(message = "orderId must be > 0") Long orderId,
             @Valid @RequestBody MenuItemRequestDTO newMenuItem) {
 
-        Optional<Order> existingOrder = this.orderService.removeMenuItemFromOrder(orderId, newMenuItem);
+        Optional<Order> existingOrder = orderService.removeMenuItemFromOrder(orderId, newMenuItem);
         OrderResponseDTO orderResponse;
 
         if (existingOrder.isEmpty()) {
@@ -291,7 +291,7 @@ public class OrdersController {
             @PathVariable @NotBlank(message = "orderName is required") String orderName,
             @Valid @RequestBody MenuItemRequestDTO newMenuItem) {
 
-        Optional<Order> existingOrder = this.orderService.removeMenuItemFromOrder(orderName, newMenuItem);
+        Optional<Order> existingOrder = orderService.removeMenuItemFromOrder(orderName, newMenuItem);
         OrderResponseDTO orderResponse;
 
         if (existingOrder.isEmpty()) {

@@ -68,17 +68,17 @@ public class MenuItemServiceImpl implements MenuItemService {
 
     @Override
     public List<MenuItem> getAllMenuItems() {
-        return this.menuItemRepository.findAll();
+        return menuItemRepository.findAll();
     }
 
     @Override
     public Optional<MenuItem> getMenuItemById(long menuItemId) {
-        return this.menuItemRepository.findById(menuItemId);
+        return menuItemRepository.findById(menuItemId);
     }
 
     @Override
     public Optional<MenuItem> getMenuItemByName(String menuItemName) {
-        return this.menuItemRepository.findByName(menuItemName);
+        return menuItemRepository.findByName(menuItemName);
     }
 
     @Override
@@ -95,11 +95,11 @@ public class MenuItemServiceImpl implements MenuItemService {
     @Override
     public MenuItem deleteMenuItem(MenuItemRequestDTO menuItem) {
         Long menuItemId = getMenuItemIdByName(menuItem.getName());
-        Optional<MenuItem> menuItemToDelete = this.menuItemRepository.findById(menuItemId);
+        Optional<MenuItem> menuItemToDelete = menuItemRepository.findById(menuItemId);
         MenuItem deletedMenuItem = null;
 
         if (menuItemToDelete.isPresent()) {
-            this.menuItemRepository.deleteById(menuItemId);
+            menuItemRepository.deleteById(menuItemId);
             deletedMenuItem = menuItemToDelete.get();
         }
 
@@ -108,10 +108,10 @@ public class MenuItemServiceImpl implements MenuItemService {
 
     @Override
     public Optional<MenuItem> deleteMenuItem(long menuItemId) {
-        Optional<MenuItem> menuItemToDelete = this.menuItemRepository.findById(menuItemId);
+        Optional<MenuItem> menuItemToDelete = menuItemRepository.findById(menuItemId);
 
         if (menuItemToDelete.isPresent()) {
-            this.menuItemRepository.deleteById(menuItemId);
+            menuItemRepository.deleteById(menuItemId);
         }
 
         return menuItemToDelete;
@@ -119,10 +119,10 @@ public class MenuItemServiceImpl implements MenuItemService {
 
     @Override
     public Optional<MenuItem> deleteMenuItem(String menuItemName) {
-        Optional<MenuItem> menuItemToDelete = this.menuItemRepository.findByName(menuItemName);
+        Optional<MenuItem> menuItemToDelete = menuItemRepository.findByName(menuItemName);
 
         if (menuItemToDelete.isPresent()) {
-            this.menuItemRepository.deleteById(menuItemToDelete.get().getId());
+            menuItemRepository.deleteById(menuItemToDelete.get().getId());
         }
 
         return menuItemToDelete;
@@ -130,14 +130,14 @@ public class MenuItemServiceImpl implements MenuItemService {
 
     @Override
     public long getMenuItemIdByName(String name) {
-        Optional<MenuItem> menuItem = this.menuItemRepository.findByName(name);
+        Optional<MenuItem> menuItem = menuItemRepository.findByName(name);
 
         return menuItem.map(MenuItem::getId).orElse(UNKNOWN_MENU_ITEM);
     }
 
     public MenuItem createMenuItem(MenuItemEnum menuItem) {
         Optional<MenuItem> existingMenuItem =
-                this.menuItemRepository.findByName(menuItem.getShortName());
+                menuItemRepository.findByName(menuItem.getShortName());
 
         if (existingMenuItem.isPresent()) {
             // need to throw some problem or log
@@ -145,7 +145,7 @@ public class MenuItemServiceImpl implements MenuItemService {
         }
 
         MenuItem newMenuItem = new MenuItem(menuItem.getShortName());
-        long menuItemDuration = this.menuItemDurations.getMenuItemDuration(menuItem);
+        long menuItemDuration = menuItemDurations.getMenuItemDuration(menuItem);
         MenuItemDuration newMenuItemDuration =
                 new MenuItemDuration(newMenuItem.getId(), newMenuItem, menuItemDuration);
 
@@ -153,7 +153,7 @@ public class MenuItemServiceImpl implements MenuItemService {
         newMenuItem.setMiDuration(newMenuItemDuration);
         newMenuItemDuration.setMenuItem(newMenuItem);
 
-        this.menuItemRepository.save(newMenuItem);
+        menuItemRepository.save(newMenuItem);
 
         return newMenuItem;
     }

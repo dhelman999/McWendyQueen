@@ -42,9 +42,9 @@ class OrdersControllerTest {
     void createOrder_blankName_returnsBadRequestWithValidationPayload() throws Exception {
         OrderRequestDTO invalidRequest = new OrderRequestDTO(" ");
 
-        this.mockMvc.perform(post("/api/v1/orders")
+        mockMvc.perform(post("/api/v1/orders")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(this.objectMapper.writeValueAsString(invalidRequest)))
+                        .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400))
                 .andExpect(jsonPath("$.errors").isArray());
@@ -52,9 +52,9 @@ class OrdersControllerTest {
 
     @Test
     void deleteOrderById_missingOrder_returnsNotFound() throws Exception {
-        when(this.orderService.deleteOrder(999L)).thenReturn(Optional.empty());
+        when(orderService.deleteOrder(999L)).thenReturn(Optional.empty());
 
-        this.mockMvc.perform(delete("/api/v1/orders/999"))
+        mockMvc.perform(delete("/api/v1/orders/999"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value(404));
     }
@@ -63,12 +63,12 @@ class OrdersControllerTest {
     void deleteCondimentByMissingOrder_returnsNotFound() throws Exception {
         CondimentItemRequestDTO requestBody = new CondimentItemRequestDTO("lettuce");
 
-        when(this.orderService.removeCondimentFromOrder(eq(999L), any(CondimentItemRequestDTO.class)))
+        when(orderService.removeCondimentFromOrder(eq(999L), any(CondimentItemRequestDTO.class)))
                 .thenReturn(Optional.empty());
 
-        this.mockMvc.perform(delete(API_BASE_PATH + V1_PATH + ORDER_PATH + CONDIMENTS_PATH + "/999")
+        mockMvc.perform(delete(API_BASE_PATH + V1_PATH + ORDER_PATH + CONDIMENTS_PATH + "/999")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(this.objectMapper.writeValueAsString(requestBody))
+                        .content(objectMapper.writeValueAsString(requestBody))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value(404));
