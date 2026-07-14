@@ -26,10 +26,10 @@ public class ExceptionFactory {
         if (ex instanceof MethodArgumentNotValidException || ex instanceof WebExchangeBindException) {
             return new SpringBindingExceptionMessage(ex);
         }
-        else if(ex instanceof BindException) {
+        else if (ex instanceof BindException) {
             return new BindExceptionMessage(ex);
         }
-        else if(isHttpNative(ex)) {
+        else if (isHttpNative(ex)) {
             return new SpringHttpErrorMessage(ex);
         }
 

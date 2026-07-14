@@ -1,19 +1,20 @@
 package com.mcwendyqueen.service.recipe;
 
+import java.util.List;
+import java.util.Optional;
+
+import com.mcwendyqueen.model.ModelMapperUtils;
 import com.mcwendyqueen.model.condiment.CondimentItem;
 import com.mcwendyqueen.model.menuitem.MenuItem;
-import com.mcwendyqueen.model.ModelMapperUtils;
 import com.mcwendyqueen.model.recipe.RecipeItem;
 import com.mcwendyqueen.model.recipe.RecipeItemRequestDTO;
 import com.mcwendyqueen.model.recipe.RecipeItemResponseDTO;
 import com.mcwendyqueen.model.recipe.RecipeRepository;
 import com.mcwendyqueen.service.condiment.CondimentItemServiceImpl;
 import com.mcwendyqueen.service.menuitem.MenuItemService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 import static com.mcwendyqueen.service.condiment.CondimentItemServiceImpl.CondimentEnum.CHEESE;
 import static com.mcwendyqueen.service.condiment.CondimentItemServiceImpl.CondimentEnum.LETTUCE;
@@ -26,16 +27,16 @@ import static com.mcwendyqueen.service.menuitem.MenuItemServiceImpl.MenuItemEnum
 
 @Service
 public class RecipeItemServiceImpl implements RecipeItemService {
+
     private final RecipeRepository recipeRepository;
 
     private final CondimentItemServiceImpl condimentItemService;
+
     private final MenuItemService menuItemService;
 
     @Autowired
-    public RecipeItemServiceImpl(
-            RecipeRepository recipeRepository,
-            CondimentItemServiceImpl condimentItemService,
-            MenuItemService menuItemService) {
+    public RecipeItemServiceImpl(RecipeRepository recipeRepository,
+            CondimentItemServiceImpl condimentItemService, MenuItemService menuItemService) {
         this.recipeRepository = recipeRepository;
         this.condimentItemService = condimentItemService;
         this.menuItemService = menuItemService;
@@ -44,31 +45,36 @@ public class RecipeItemServiceImpl implements RecipeItemService {
 
     @Override
     public List<RecipeItem> getAllRecipeItems() {
-        return recipeRepository.findAll();
+        return this.recipeRepository.findAll();
     }
 
     @Override
     public Optional<RecipeItem> getRecipeItemById(long recipeId) {
-        return recipeRepository.findById(recipeId);
+        return this.recipeRepository.findById(recipeId);
     }
 
     @Override
     public Optional<RecipeItem> getRecipeItemByName(String menuItemName, String condimentName) {
-        long menuId = menuItemService.getMenuItemIdByName(menuItemName);
-        long condimentId = condimentItemService.getCondimentItemIdByName(condimentName);
+        long menuId = this.menuItemService.getMenuItemIdByName(menuItemName);
+        long condimentId = this.condimentItemService.getCondimentItemIdByName(condimentName);
 
-        return recipeRepository.findByMenuIdAndCondimentId(menuId, condimentId);
+        return this.recipeRepository.findByMenuIdAndCondimentId(menuId, condimentId);
     }
 
     @Override
     public RecipeItemResponseDTO hydrateRecipeItem(RecipeItem recipeItem) {
-        if(recipeItem == null) {
+        if (recipeItem == null) {
             return null;
         }
 
         RecipeItemResponseDTO recipeDTO = ModelMapperUtils.GetRecipeItemResponseDTO(recipeItem);
-        recipeDTO.setMenuItemName(menuItemService.getMenuItemById(recipeDTO.getMenuId()).map(MenuItem::getName).orElse(null));
-        recipeDTO.setCondimentName(condimentItemService.getCondimentItemById(recipeDTO.getCondimentId()).map(CondimentItem::getName).orElse(null));
+
+        recipeDTO.setMenuItemName(this.menuItemService.getMenuItemById(recipeDTO.getMenuId())
+                .map(MenuItem::getName)
+                .orElse(null));
+        recipeDTO.setCondimentName(this.condimentItemService.getCondimentItemById(recipeDTO.getCondimentId())
+                .map(CondimentItem::getName)
+                .orElse(null));
 
         return recipeDTO;
     }
@@ -80,32 +86,34 @@ public class RecipeItemServiceImpl implements RecipeItemService {
 
     @Override
     public RecipeItem deleteRecipeItem(RecipeItemRequestDTO recipeItem) {
-        Optional<MenuItem> existingMenuItem = menuItemService.getMenuItemByName(recipeItem.getMenuItemName());
-        Optional<CondimentItem> existingCondiment = condimentItemService.getCondimentByName(recipeItem.getCondimentName());
+        Optional<MenuItem> existingMenuItem =
+                this.menuItemService.getMenuItemByName(recipeItem.getMenuItemName());
+        Optional<CondimentItem> existingCondiment =
+                this.condimentItemService.getCondimentByName(recipeItem.getCondimentName());
 
-        if(existingMenuItem.isEmpty() || existingCondiment.isEmpty()) {
+        if (existingMenuItem.isEmpty() || existingCondiment.isEmpty()) {
             return null;
         }
 
-        Optional<RecipeItem> existingRecipe = recipeRepository.findByMenuIdAndCondimentId(
+        Optional<RecipeItem> existingRecipe = this.recipeRepository.findByMenuIdAndCondimentId(
                 existingMenuItem.get().getId(), existingCondiment.get().getId());
 
-        if(existingRecipe.isEmpty()) {
+        if (existingRecipe.isEmpty()) {
             // todo throw an error and log
             return null;
         }
 
-        recipeRepository.deleteById(existingRecipe.get().getId());
+        this.recipeRepository.deleteById(existingRecipe.get().getId());
 
         return existingRecipe.get();
     }
 
     @Override
     public Optional<RecipeItem> deleteRecipeItem(long recipeId) {
-        Optional<RecipeItem> recipeToDelete = recipeRepository.findById(recipeId);
+        Optional<RecipeItem> recipeToDelete = this.recipeRepository.findById(recipeId);
 
-        if(recipeToDelete.isPresent()) {
-            recipeRepository.deleteById(recipeId);
+        if (recipeToDelete.isPresent()) {
+            this.recipeRepository.deleteById(recipeId);
         }
 
         return recipeToDelete;
@@ -115,25 +123,26 @@ public class RecipeItemServiceImpl implements RecipeItemService {
     public Optional<RecipeItem> deleteRecipeItem(String menuItemName, String condimentName) {
         Optional<RecipeItem> recipeToDelete = getRecipeItemByName(menuItemName, condimentName);
 
-        if(recipeToDelete.isPresent()) {
-            recipeRepository.deleteById(recipeToDelete.get().getId());
+        if (recipeToDelete.isPresent()) {
+            this.recipeRepository.deleteById(recipeToDelete.get().getId());
         }
 
         return recipeToDelete;
     }
 
     private RecipeItem createRecipeItem(String menuItemName, String condimentName) {
-        long menuId = menuItemService.getMenuItemIdByName(menuItemName);
-        long condimentId = condimentItemService.getCondimentItemIdByName(condimentName);
-        Optional<RecipeItem> existingRecipe = recipeRepository.findByMenuIdAndCondimentId(menuId, condimentId);
+        long menuId = this.menuItemService.getMenuItemIdByName(menuItemName);
+        long condimentId = this.condimentItemService.getCondimentItemIdByName(condimentName);
+        Optional<RecipeItem> existingRecipe =
+                this.recipeRepository.findByMenuIdAndCondimentId(menuId, condimentId);
 
-        if(existingRecipe.isPresent()) {
+        if (existingRecipe.isPresent()) {
             return existingRecipe.get();
         }
 
         RecipeItem newRecipeItem = new RecipeItem(menuId, condimentId);
 
-        return recipeRepository.save(newRecipeItem);
+        return this.recipeRepository.save(newRecipeItem);
     }
 
     private void addAllRecipeItems() {

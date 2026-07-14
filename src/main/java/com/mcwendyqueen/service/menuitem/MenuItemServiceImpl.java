@@ -1,14 +1,16 @@
 package com.mcwendyqueen.service.menuitem;
 
+import java.util.List;
+import java.util.Optional;
+
+import lombok.Getter;
+
 import com.mcwendyqueen.model.menuitem.MenuItem;
 import com.mcwendyqueen.model.menuitem.MenuItemRepository;
 import com.mcwendyqueen.model.menuitem.MenuItemRequestDTO;
-import lombok.Getter;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 import static com.mcwendyqueen.service.menuitem.MenuItemServiceImpl.MenuItemEnum.CHEESEBURGER;
 import static com.mcwendyqueen.service.menuitem.MenuItemServiceImpl.MenuItemEnum.FRIES;
@@ -16,9 +18,10 @@ import static com.mcwendyqueen.service.menuitem.MenuItemServiceImpl.MenuItemEnum
 
 @Service
 public class MenuItemServiceImpl implements MenuItemService {
-    private final MenuItemRepository menuItemRepository;
 
     public static final long UNKNOWN_MENU_ITEM = -1;
+
+    private final MenuItemRepository menuItemRepository;
 
     @Getter
     public enum MenuItemEnum {
@@ -34,7 +37,7 @@ public class MenuItemServiceImpl implements MenuItemService {
 
         @Override
         public String toString() {
-            return shortName;
+            return this.shortName;
         }
     }
 
@@ -46,19 +49,19 @@ public class MenuItemServiceImpl implements MenuItemService {
 
     @Override
     public List<MenuItem> getAllMenuItems() {
-        return menuItemRepository.findAll();
+        return this.menuItemRepository.findAll();
     }
 
     @Override
     public Optional<MenuItem> getMenuItemById(long menuItemId) {
-        return menuItemRepository.findById(menuItemId);
+        return this.menuItemRepository.findById(menuItemId);
     }
 
     @Override
     public Optional<MenuItem> getMenuItemByName(String menuItemName) {
-        return menuItemRepository.findByName(menuItemName);
+        return this.menuItemRepository.findByName(menuItemName);
     }
-    
+
     @Override
     public MenuItem createMenuItem(MenuItemRequestDTO newMenuItem) {
         return createMenuItem(newMenuItem.getName());
@@ -67,12 +70,11 @@ public class MenuItemServiceImpl implements MenuItemService {
     @Override
     public MenuItem deleteMenuItem(MenuItemRequestDTO menuItem) {
         Long menuItemId = getMenuItemIdByName(menuItem.getName());
-
-        Optional<MenuItem> menuItemToDelete = menuItemRepository.findById(menuItemId);
+        Optional<MenuItem> menuItemToDelete = this.menuItemRepository.findById(menuItemId);
         MenuItem deletedMenuItem = null;
 
         if (menuItemToDelete.isPresent()) {
-            menuItemRepository.deleteById(menuItemId);
+            this.menuItemRepository.deleteById(menuItemId);
             deletedMenuItem = menuItemToDelete.get();
         }
 
@@ -81,10 +83,10 @@ public class MenuItemServiceImpl implements MenuItemService {
 
     @Override
     public Optional<MenuItem> deleteMenuItem(long menuItemId) {
-        Optional<MenuItem> menuItemToDelete = menuItemRepository.findById(menuItemId);
+        Optional<MenuItem> menuItemToDelete = this.menuItemRepository.findById(menuItemId);
 
         if (menuItemToDelete.isPresent()) {
-            menuItemRepository.deleteById(menuItemId);
+            this.menuItemRepository.deleteById(menuItemId);
         }
 
         return menuItemToDelete;
@@ -92,10 +94,10 @@ public class MenuItemServiceImpl implements MenuItemService {
 
     @Override
     public Optional<MenuItem> deleteMenuItem(String menuItemName) {
-        Optional<MenuItem> menuItemToDelete = menuItemRepository.findByName(menuItemName);
+        Optional<MenuItem> menuItemToDelete = this.menuItemRepository.findByName(menuItemName);
 
         if (menuItemToDelete.isPresent()) {
-            menuItemRepository.deleteById(menuItemToDelete.get().getId());
+            this.menuItemRepository.deleteById(menuItemToDelete.get().getId());
         }
 
         return menuItemToDelete;
@@ -103,22 +105,22 @@ public class MenuItemServiceImpl implements MenuItemService {
 
     @Override
     public long getMenuItemIdByName(String name) {
-        Optional<MenuItem> menuItem = menuItemRepository.findByName(name);
+        Optional<MenuItem> menuItem = this.menuItemRepository.findByName(name);
 
         return menuItem.map(MenuItem::getId).orElse(UNKNOWN_MENU_ITEM);
-
     }
 
     public MenuItem createMenuItem(String name) {
-        Optional<MenuItem> existingMenuItem = menuItemRepository.findByName(name);
+        Optional<MenuItem> existingMenuItem = this.menuItemRepository.findByName(name);
 
-        if(existingMenuItem.isPresent()) {
+        if (existingMenuItem.isPresent()) {
             // need to throw some problem or log
             return existingMenuItem.get();
         }
 
         MenuItem newMenuItem = new MenuItem(name);
-        menuItemRepository.save(newMenuItem);
+
+        this.menuItemRepository.save(newMenuItem);
 
         return newMenuItem;
     }

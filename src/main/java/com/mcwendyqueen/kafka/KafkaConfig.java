@@ -22,8 +22,9 @@ public class KafkaConfig {
                 .build();
     }
 
-    @KafkaListener(id = "listenerId", topics = "order_events_topic")
-    public void listen(String in) {
-        System.out.println(in);
-    }
+    // Replaced by OrderEventConsumer — kept here as reference only.
+    // @KafkaListener(id = "listenerId", topics = "order_events_topic")
+    // public void listen(String in) {
+    //     System.out.println(in);
+    // }
 }

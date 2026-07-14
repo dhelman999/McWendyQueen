@@ -4,12 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import static com.mcwendyqueen.model.order.OrderStatus.*;
+import com.mcwendyqueen.model.order.OrderStatus.OrderStatusEnum;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderEventLightPayload {
+
     private long id;
 
     private String name;
