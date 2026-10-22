@@ -1,5 +1,20 @@
 app:
   debug-features-enabled: true
+  # Placeholder limits, deliberately generous. Real values wait on the ops
+  # baseline (T06).
+  rate-limit:
+    enabled: true
+    max-tracked-keys: 10000
+    sweep-interval: 1m
+    groups:
+      general:
+        capacity: 1000
+        refill-tokens: 100
+        refill-period: 1s
+      orders:
+        capacity: 100
+        refill-tokens: 10
+        refill-period: 1s
 
 logging:
   level:

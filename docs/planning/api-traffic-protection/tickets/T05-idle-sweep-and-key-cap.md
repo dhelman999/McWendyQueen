@@ -2,7 +2,8 @@
 
 - Slug: `api-traffic-protection`
 - Size: S
-- Depends on: T02, T03
+- Depends on: T02, T03, T04 (shared file `RateLimitConfig`, so this ticket runs
+  after T04 lands)
 - PRD: `docs/planning/api-traffic-protection/prd.md`
 - Spec: `docs/planning/api-traffic-protection/spec.md`
 
@@ -20,6 +21,10 @@ many addresses arrive at once.
       `tryConsume` on the same key.
 - [ ] Scheduling is local to the rate limiter. The app has no `@EnableScheduling`
       today; turning it on app-wide is a decision recorded here, not a side effect.
+      **Decision (2026-10-22):** local. `BucketSweeper` owns one named daemon
+      executor thread, and Spring stops it through the inferred `close()`. No
+      app-wide `@EnableScheduling`: it would switch on any future `@Scheduled`
+      method for one internal timer. Revisit if a second periodic job appears.
 - [ ] When `max-tracked-keys` is reached, a new key passes through unlimited and a
       WARN is logged at most once per sweep interval (the spec's recommended
       default: an address spray is DDoS, a non-goal).
@@ -37,6 +42,8 @@ many addresses arrive at once.
 ## Likely files
 
 - `src/main/java/com/mcwendyqueen/ratelimit/BucketStore.java`
+- `src/main/java/com/mcwendyqueen/ratelimit/RateLimitConfig.java` (**shared file**,
+  created by T04: wire the sweeper and pass `max-tracked-keys` into the store)
 - `src/main/java/com/mcwendyqueen/ratelimit/BucketSweeper.java` (new)
 - `src/test/java/com/mcwendyqueen/ratelimit/BucketSweeperTest.java` (new)
 

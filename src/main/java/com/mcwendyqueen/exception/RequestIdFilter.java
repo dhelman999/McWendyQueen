@@ -11,10 +11,17 @@ import jakarta.servlet.ServletResponse;
 
 import org.slf4j.MDC;
 
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
+@Order(RequestIdFilter.ORDER)
 public class RequestIdFilter implements Filter {
+
+    // Runs after Boot's CharacterEncodingFilter (HIGHEST_PRECEDENCE) and before every app
+    // filter, so later filters such as the rate limiter see requestId in the MDC.
+    public static final int ORDER = Ordered.HIGHEST_PRECEDENCE + 10;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)

@@ -35,6 +35,7 @@ src/main/java/com/mcwendyqueen/
   controller/                  5 REST controllers
   exception/                   global error handling + RequestIdFilter
   kafka/                       producer/consumer config, producer, placeholder consumer, study notes
+  ratelimit/                   per-client rate limiting (api-traffic-protection T02-T05)
   model/<domain>/              JPA entities, request/response DTOs, repositories
   service/<domain>/            interface + Impl per domain; eligibility client; order scheduler
 src/main/resources/            application.yml, logback-spring.xml
@@ -107,8 +108,9 @@ Only CREATED is ever set today.
 
 ## Errors and request correlation
 
-- `RequestIdFilter` (a `@Component` servlet `Filter`) puts a random UUID in MDC `requestId`
-  and clears MDC afterwards. The id is **not** returned as a response header.
+- `RequestIdFilter` (a `@Component` servlet `Filter` at `RequestIdFilter.ORDER`) puts a
+  random UUID in MDC `requestId` and clears MDC afterwards. The id is **not** returned
+  as a response header.
 - `GlobalExceptionHandler` (`@RestControllerAdvice`, handles `Exception`) ->
   `ExceptionFactory` picks a payload class:
   `SpringBindingExceptionMessage` (validation), `BindExceptionMessage`, `SpringHttpErrorMessage`
@@ -153,6 +155,9 @@ timestamps). The datasource passwords in `application.yml`, the test `applicatio
 `LOCAL_DEV_SETUP.md` are local Docker/H2 defaults, documented on purpose.
 
 ## Landing zone for request rate limiting
+
+Implemented 2026-10-22 in `ratelimit/` (tickets T01-T05 under
+`docs/planning/api-traffic-protection/`). The facts below are the planning input.
 
 Facts that a rate-limiting feature has to work with:
 

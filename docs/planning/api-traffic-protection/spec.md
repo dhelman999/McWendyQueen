@@ -5,6 +5,10 @@
 - Research: `docs/planning/api-traffic-protection/research.md`
 - Status: accepted (2026-10-19, owner review)
 - Date: 2026-10-19
+- Amended: 2026-10-21. The bucket store is keyed by client address alone, with one
+  bucket per route group (see `tickets/T02-token-bucket-store.md`, Amendment).
+- Amended: 2026-10-21. Refill is tokens per period, not tokens per second (see T02,
+  Amendment 2).
 
 ## Problem and goals
 
@@ -56,8 +60,8 @@ nothing to apply to yet: the app has no health endpoint.
 - The filter is registered through a `FilterRegistrationBean` on `/api/v1/*`, with
   an explicit order **after** `RequestIdFilter`. That way the request id is already
   in the logging context (MDC) when the filter logs a throttle.
-  `RequestIdFilter` (`exception/RequestIdFilter.java`) has no explicit order today
-  and needs one.
+  `RequestIdFilter` (`exception/RequestIdFilter.java`) is ordered at
+  `RequestIdFilter.ORDER` (T01).
 - The filter writes its own 429 response. `GlobalExceptionHandler` never sees errors
   thrown in a filter. The 429 body should match the shape of the app's other error
   responses.
@@ -75,10 +79,11 @@ nothing to apply to yet: the app has no health endpoint.
   throttles sustained traffic. It doesn't let a client double its limit at a window
   boundary, and the retry time is one formula.
 - **Data model:** in memory only, nothing persisted. Key = (client address, route
-  group); value = (tokens, last refill time). A scheduled sweep removes buckets idle
-  long enough to have refilled completely. Such a bucket is identical to a new one,
-  so no state is lost. A hard cap on tracked keys backs up the sweep. All state
-  resets on restart, and that is acceptable.
+  group); value = (tokens, last refill time). *Amended 2026-10-21:* key = client
+  address, value = one (tokens, last refill time) per route group (see T02). A
+  scheduled sweep removes buckets idle long enough to have refilled completely. Such a
+  bucket is identical to a new one, so no state is lost. A hard cap on tracked keys
+  backs up the sweep. All state resets on restart, and that is acceptable.
 - **Configuration:** `app.rate-limit.*`, bound through `@ConfigurationProperties`
   with validation. Ops edit `application.yml` or environment variables, and the
   change takes effect on restart. Shape:
@@ -90,8 +95,8 @@ nothing to apply to yet: the app has no health endpoint.
       max-tracked-keys: 100000
       sweep-interval: 1m
       groups:
-        general: { capacity: TBD, refill-per-second: TBD }
-        orders:  { capacity: TBD, refill-per-second: TBD }
+        general: { capacity: TBD, refill-tokens: TBD, refill-period: TBD }
+        orders:  { capacity: TBD, refill-tokens: TBD, refill-period: TBD }
   ```
 
   The limit values wait on the ops traffic baseline. The defaults must be generous
@@ -107,7 +112,7 @@ nothing to apply to yet: the app has no health endpoint.
 
 ## Missing pieces
 
-- An explicit order on `RequestIdFilter`.
+- An explicit order on `RequestIdFilter` (done in T01).
 - Limit values, which need the ops traffic baseline (about a week of monitoring).
 - A 429 error body in the app's error-response shape.
 - Tests:
@@ -135,10 +140,11 @@ what sits in front of the service, is out of scope by the PRD.
 Left open on purpose (owner, 2026-10-19). The implementing developer settles them,
 using the recommendations as the default.
 
-- [ ] Does an order also count against the client's `general` bucket? Recommended:
-      yes, so one client's total traffic stays bounded.
-- [ ] When the tracked-key cap is hit: let requests through and log it
+- [x] Does an order also count against the client's `general` bucket? Recommended:
+      yes, so one client's total traffic stays bounded. **Settled: yes** (T04).
+- [x] When the tracked-key cap is hit: let requests through and log it
       (recommended, because an address spray is DDoS, a non-goal), or answer 429?
+      **Settled: let through, one WARN per sweep interval** (T05).
 - [ ] Shared addresses (carrier NAT, office Wi-Fi): accept as a known v1 limitation
       and mitigate with generous limits and throttle logs? (Recommended; the owner
       has not chosen.)

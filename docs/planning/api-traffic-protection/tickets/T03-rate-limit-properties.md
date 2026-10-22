@@ -14,13 +14,15 @@ startup with a clear message instead of failing quietly at request time.
 
 ## Acceptance criteria
 
-- [ ] A `@ConfigurationProperties("app.rate-limit")` class with `@Validated`,
+- [ ] A `@Component @ConfigurationProperties("app.rate-limit")` class with
+      `@Validated` (the `KafkaAppConfig` pattern; the only registration in main
+      code, see `prime-shared.md`),
       matching the spec's shape: `enabled`, `max-tracked-keys`, `sweep-interval`,
-      and `groups.general` / `groups.orders`, each with `capacity` and
-      `refill-per-second`.
-- [ ] Validation: capacity, refill and `max-tracked-keys` are at least 1, and
-      `sweep-interval` is positive. An invalid value fails startup and the message
-      names the property.
+      and `groups.general` / `groups.orders`, each with `capacity`,
+      `refill-tokens` and `refill-period` (T02, Amendment 2).
+- [ ] Validation: capacity, `refill-tokens` and `max-tracked-keys` are at least 1, and
+      `refill-period` and `sweep-interval` are positive. An invalid value fails
+      startup and the message names the property.
 - [ ] `application.yml` gets an `app.rate-limit` block with deliberately generous
       placeholder values. A comment says the real values wait on the ops baseline
       (T06).
@@ -28,7 +30,9 @@ startup with a clear message instead of failing quietly at request time.
       relaxed binding (for example `APP_RATELIMIT_GROUPS_ORDERS_CAPACITY`); a test
       proves one.
 - [ ] `enabled: false` is exposed for T04 to switch the limiter off entirely.
-- [ ] The test `application.yml` sets small, fixed values the T04 tests can rely on.
+- [ ] `src/test/resources/application.yml` sets small, fixed values under
+      `app.rate-limit` that T04 and T05 rely on. That file replaces the main one for
+      tests. The values are pinned in `prime-shared.md`, "Test values".
 
 ## Definition of done
 
@@ -42,10 +46,16 @@ startup with a clear message instead of failing quietly at request time.
 
 - `src/main/java/com/mcwendyqueen/ratelimit/RateLimitProperties.java` (new)
 - `src/main/resources/application.yml`
-- `src/test/java/resources/application.yml`
+- `src/test/resources/application.yml`
 - `src/test/java/com/mcwendyqueen/ratelimit/RateLimitPropertiesTest.java` (new)
 
 ## Validation (do this before calling the ticket done)
+
+Failing tests are already written against stubs (2026-10-21):
+`RateLimitPropertiesTest` (11), 8 red on assertions. Three are green on the stub by
+design because they only check binding shape: the test values, `enabled: false`,
+and the environment override. The test `application.yml` values are already in
+place. Implement until all 11 are green; do not edit their assertions.
 
 - Unit: `./mvnw test -Dtest=RateLimitPropertiesTest`
 - Full suite: `./mvnw test`

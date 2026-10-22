@@ -50,13 +50,30 @@ Every throttle writes one WARN line ops can trace.
 ## Likely files
 
 - `src/main/java/com/mcwendyqueen/ratelimit/RateLimitFilter.java` (new)
-- `src/main/java/com/mcwendyqueen/ratelimit/RateLimitConfig.java` (new, registration)
-- `src/main/java/com/mcwendyqueen/ratelimit/RouteGroup.java` (new)
+- `src/main/java/com/mcwendyqueen/ratelimit/RateLimitConfig.java` (new, registration;
+  **shared file**, T05 edits it after this ticket lands)
 - `src/main/java/com/mcwendyqueen/exception/` (a 429 message type, if that keeps
   the body shape in one place)
 - `src/test/java/com/mcwendyqueen/ratelimit/RateLimitFilterTest.java` (new)
 
 ## Validation (do this before calling the ticket done)
+
+Failing tests are already written against stubs (2026-10-21). Implement until they
+are green; do not edit their assertions.
+
+- `RateLimitFilterTest` (15): 13 red on assertions.
+- `RateLimitAcceptanceTest` (5, real Tomcat on 127.0.0.x): all red. It covers
+  path parameters. `/orders;x=1` and `/v1;v=1/orders` both route to `createOrder`
+  on Tomcat (verified 2026-10-21), so classify on the routed path.
+- `RateLimitDisabledTest` (1): green by design.
+
+Two `RateLimitFilterTest` tests are green on the stub by design:
+`admin_isExemptAndDoesNotSpendGeneral` and `allowedRequest_logsNoThrottleLine`.
+Each is a no-regression guard and only means something beside its red
+neighbours. The frozen clock is a `@Primary LongSupplier`, so `RateLimitConfig`
+must take the clock as a `LongSupplier` bean.
+
+- Acceptance: `./mvnw test -Dtest=RateLimitAcceptanceTest` (no Docker needed)
 
 - Slice: `./mvnw test -Dtest=RateLimitFilterTest`
 - Full suite: `./mvnw test`

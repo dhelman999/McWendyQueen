@@ -36,6 +36,11 @@ Behavior for existing requests does not change.
 
 ## Validation (do this before calling the ticket done)
 
+Failing tests are already written (2026-10-21): `RequestIdFilterTest` (4), 3 red on
+assertions. The stub has `ORDER`, but the filter is not ordered yet.
+`requestIdFilter_afterRequest_clearsMdc` is a characterization test, green before
+and after. Implement until all 4 are green; do not edit their assertions.
+
 - Unit: `./mvnw test -Dtest=RequestIdFilterTest`
 - Full suite: `./mvnw test`
 - Manual: run the app, call an `/api/v1` endpoint that errors, and confirm the
