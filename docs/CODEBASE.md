@@ -39,7 +39,7 @@ src/main/java/com/mcwendyqueen/
   service/<domain>/            interface + Impl per domain; eligibility client; order scheduler
 src/main/resources/            application.yml, logback-spring.xml
 src/test/java/                 @WebMvcTest controller tests + Mockito service tests
-src/test/java/resources/       application.yml (note: not src/test/resources - see Known issues)
+src/test/resources/            application.yml (replaces the main one for tests - see Known issues)
 ```
 
 Package convention: `com.mcwendyqueen.<layer>.<domain>`. Constructor injection, `@Slf4j`,
@@ -141,7 +141,7 @@ Line numbers are as of `6dd5007`.
 | 4 | `KafkaConsumerConfig.java:38` | bootstrap servers hard-coded instead of read from `spring.kafka.bootstrap-servers`. |
 | 5 | `OrderScheduler` + `OrderEventConsumer` | two listeners in two groups on one topic, so every event is processed twice. |
 | 6 | `OrderServiceImpl.java:51` | idempotency store is in-memory and unbounded, and lost on restart. |
-| 7 | `src/test/java/resources/application.yml` | not on the test classpath (it should be `src/test/resources`). It also names a leftover `com.ninjaone.dundie_awards` logger. |
+| 7 | `src/test/resources/application.yml` | **Fixed 2026-10-21.** It sat in `src/test/java/resources`, off the test classpath, with a leftover logger from another project. Now it loads, and it **replaces** the main `application.yml` for tests rather than merging with it. |
 | 8 | `LOCAL_DEV_SETUP.md` "Kafka topic naming bug" | doc says the topic name should come from one config source; code now uses `kafka-topics.prod.orders-topic` in all three places, so the doc note looks stale. |
 | 9 | Services | seed data inserted from constructors; the condiment create path returns the existing row silently (`// need to throw some problem or log`). |
 

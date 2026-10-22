@@ -1,0 +1,25 @@
+# Test config. It replaces src/main/resources/application.yml for tests (Boot loads the
+# first classpath:/application.yml, and test-classes comes first), so nothing from the
+# main file applies here unless it is repeated below.
+#
+# Left out on purpose: Kafka, the server port and springdoc. The tests are @WebMvcTest
+# slices with mocked services, so no broker, port or API docs are needed.
+
+logging:
+  level:
+    root: INFO
+    ExceptionLogger: ERROR
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:mydb
+    username: sa
+    password: password
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
