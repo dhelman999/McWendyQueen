@@ -41,9 +41,10 @@ A servlet filter that runs before Spring MVC for every request under `/api/v1/*`
 3. **Classify the request** into a route group:
    - `orders`: `POST /api/v1/orders`, which gets its own tighter limit.
    - `general`: everything else under `/api/v1`.
-4. **Take a token** from the bucket for (client address, route group). A
-   request in the `orders` group also takes one from the client's `general` bucket
-   (**TBD — needs validation**; see the open questions).
+4. **Take a token** from the client's bucket for its route group (one store entry
+   per client address, holding a bucket per group; amended, see T02). A request in
+   the `orders` group also takes one from the client's `general` bucket (settled,
+   see T04 and the open questions).
 5. **Allowed:** pass the request on unchanged. **Over the limit:** stop the request
    and answer **429 Too Many Requests** with `Retry-After: <seconds>`, rounded up,
    and a small JSON error body. Write one WARN log line with the client address,
@@ -92,7 +93,7 @@ nothing to apply to yet: the app has no health endpoint.
   app:
     rate-limit:
       enabled: true
-      max-tracked-keys: 100000
+      max-tracked-keys: 100000   # the demo ships 10000 (owner, 2026-10-22)
       sweep-interval: 1m
       groups:
         general: { capacity: TBD, refill-tokens: TBD, refill-period: TBD }
@@ -149,5 +150,11 @@ using the recommendations as the default.
       and mitigate with generous limits and throttle logs? (Recommended; the owner
       has not chosen.)
 - [ ] Limit values for `general` and `orders`: need the ops baseline.
+- [ ] **Throttle log names the request's group, not the bucket that denied it**
+      (raised 2026-10-22 in `triple-check`). After a client drains `general`, a
+      `POST /orders` is refused by `general` (`Retry-After` 1) but the WARN line says
+      `group=orders`, which points ops at the wrong limit. Fixing it means adding the
+      denying group to `RateLimitDecision`, a type T02 owns and T04 consumes.
+      Accepted for the demo; decide before ops tune limits from these logs (T06).
 - [ ] Add `RateLimit` / `RateLimit-Policy` headers? They are still an IETF draft.
       Recommended: not in v1; `Retry-After` is the standard hint.

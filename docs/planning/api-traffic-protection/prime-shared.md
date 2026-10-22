@@ -57,9 +57,10 @@ of one type and a `NoUniqueBeanDefinitionException`. *Verified:*
 differs from the `@Component` bean name `rateLimitProperties`, so Spring does not
 merge the two.
 
-- `RateLimitProperties` is
-  `@Component @Data @Validated @ConfigurationProperties("app.rate-limit")`, the same
-  pattern as `kafka/KafkaAppConfig`. T03 owns it.
+- `RateLimitProperties` is `@Component @Getter @Setter @Validated
+  @ConfigurationProperties("app.rate-limit")`, the same `@Component
+  @ConfigurationProperties` pattern as `kafka/KafkaAppConfig` (which uses `@Data`). T03
+  owns it.
 - `RateLimitConfig` does **not** carry `@EnableConfigurationProperties`. It
   receives `RateLimitProperties` as a `@Bean` method parameter.
 - Only test contexts enable it, because they do not scan `@Component`s. A

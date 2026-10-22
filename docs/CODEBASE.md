@@ -39,7 +39,9 @@ src/main/java/com/mcwendyqueen/
   model/<domain>/              JPA entities, request/response DTOs, repositories
   service/<domain>/            interface + Impl per domain; eligibility client; order scheduler
 src/main/resources/            application.yml, logback-spring.xml
-src/test/java/                 @WebMvcTest controller tests + Mockito service tests
+src/test/java/                 @WebMvcTest controller + Mockito service tests;
+                               ratelimit/ adds unit, concurrency and context-runner
+                               tests, plus one @SpringBootTest acceptance test (H2)
 src/test/resources/            application.yml (replaces the main one for tests - see Known issues)
 ```
 

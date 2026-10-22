@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * T05: the idle sweep and the tracked-key cap, on a hand-driven clock. Logic tests call sweepOnce()
- * directly; only the shutdown tests start the timer.
+ * directly; the timer is started only by the shutdown tests and the test that proves it sweeps.
  */
 @ExtendWith(OutputCaptureExtension.class)
 class BucketSweeperTest {

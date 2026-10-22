@@ -2,8 +2,9 @@
 # first classpath:/application.yml, and test-classes comes first), so nothing from the
 # main file applies here unless it is repeated below.
 #
-# Left out on purpose: the server port. Kafka and springdoc are below only so that
-# full-context tests (RateLimitAcceptanceTest) start without a broker.
+# Left out on purpose: the server port. Kafka is below only so full-context tests
+# (RateLimitAcceptanceTest) start without a broker, and springdoc so that /openapi and
+# /swagger-ui.html resolve there.
 
 logging:
   level:

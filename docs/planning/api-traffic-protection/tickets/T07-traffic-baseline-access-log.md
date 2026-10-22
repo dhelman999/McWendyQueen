@@ -34,7 +34,10 @@ T06 on 2026-10-21.
 
 - [ ] Owner?
 - [ ] Is storing client addresses acceptable, and with what retention? (privacy
-      decision, outside this PRD)
+      decision, outside this PRD). The same question covers T04's throttle WARN, which
+      writes the client address to `logs/application.log` (14-day history). Owner,
+      2026-10-22: acceptable for the demo and promotion; a future privacy ticket
+      decides it for both.
 - [ ] Is the address the app sees the client's own? (PRD assumption; if a proxy
       rewrites it, the baseline would show one "client")
 - [ ] Where is the data analyzed, and who produces the T06 numbers from it?
